@@ -1,0 +1,20 @@
+TestFiles/
+utils/
+verification_tool/
+
+# 忽略所有 __pycache__ 目录
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+**/__init__.py
+
+# 忽略所有 .pyc 文件
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+models/model_weights/
+
+#忽略.idea文件夹
+.idea/
