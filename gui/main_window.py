@@ -122,13 +122,14 @@ class MyWindow(QMainWindow):
             try:
                 # A. 直接使用接收到的 QImage 创建用于显示的 Pixmap
                 pixmap = QPixmap.fromImage(image) # 直接使用输入的 QImage
-                scaled_pixmap = pixmap.scaled(
-                    self.camera_display.size(),
-                    Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation
-                )
-                self.last_unmarked_pixmap = scaled_pixmap # 存储用于显示的 pixmap
-                self.function_view.current_frame(scaled_pixmap)
+                #缩放和平滑处理
+                # scaled_pixmap = pixmap.scaled(
+                #     self.camera_display.size(),
+                #     Qt.AspectRatioMode.KeepAspectRatio,
+                #     Qt.TransformationMode.SmoothTransformation
+                # )
+                self.last_unmarked_pixmap = pixmap # 存储用于显示的 pixmap
+                self.function_view.current_frame(pixmap)
                 
                 # B. 将 QImage 转换为 OpenCV 格式 (NumPy 数组) 以便后续处理
                 #    需要处理不同的 QImage 格式

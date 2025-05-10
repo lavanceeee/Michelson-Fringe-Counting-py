@@ -126,6 +126,14 @@ class FunctionView(QWidget):
         try:
 
             if self.is_detecting and self._current_frame:
+
+                log_info("1.-----_current_frame-----")
+                log_info(self._current_frame.width())
+                log_info(self._current_frame.height())
+                log_info("-----_current_frame-----")
+
+
+                #设置当前帧
                 self.manual_calibration_dialog.set_frame(self._current_frame)
                 
                 log_info("function_view | 进入手动定位圆心模式")
