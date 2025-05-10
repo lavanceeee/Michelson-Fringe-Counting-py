@@ -111,45 +111,8 @@ class ManualCalibrationDialog(QDialog):
 
         if self.xy_position[0] != 0 and self.xy_position[1] != 0 and pixmap:
 
-            # marked_pixmap = self.draw_mark(self.frame_when_click, self.xy_position)
-            # self.frame_label.setPixmap(marked_pixmap)
-
             self.frame_label.set_maker(pos)
 
-    # """
-    # 实时绘制可视化十字并显示
-    # 直接使用QPainter
-    # """
-    # @staticmethod
-    # def draw_mark(pixmap,position):
-    #     try:
-    #         #不使用原图像
-    #         pixmap_copy = pixmap.copy()
-
-    #         #初始化QPainter
-    #         painter = QPainter(pixmap_copy)
-
-    #         #绘图参数 QPen
-    #         pen = QPen(QColor(255,0,0),2)
-    #         pen.setWidth(2)
-    #         painter.setPen(pen)
-
-    #         center_x = position[0]
-    #         center_y = position[1]
-
-    #         log_debug("----draw_mark中的坐标----")
-    #         log_debug(f"----center_x:{center_x}, center_y:{center_y}----")
-
-    #         #绘制水平和竖直十字
-    #         painter.drawLine(0, center_y, pixmap_copy.width(), center_y)
-    #         painter.drawLine(center_x, 0, center_x, pixmap_copy.height())
-
-    #         painter.end()
-
-    #         return pixmap_copy
-    #     except Exception as e:
-    #         log_debug(f"调用draw_mark抛出异常:{e}")
-    #         return None
 
 
 
