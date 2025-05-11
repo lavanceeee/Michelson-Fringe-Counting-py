@@ -11,7 +11,7 @@ class CameraDisplay(QLabel):
 
     def setup_ui(self):
         #摄像头区域UI
-        self.setFixedSize(400,250)
+        self.setFixedSize(256,256)
         #设置图片大小
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setStyleSheet("""

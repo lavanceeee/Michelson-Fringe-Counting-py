@@ -1,9 +1,10 @@
 import sys
 import cv2
 import numpy as np
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout, QFrame
 from PyQt6.QtCore import Qt, QTimer, QDateTime
 from PyQt6.QtGui import QPixmap, QImage
+from gui.components.figure_view import FigureView
 from gui.menu_bar import MenuBarManger
 from gui.components.camera_view import CameraDisplay
 from core.camera_controller import CameraController
@@ -49,7 +50,7 @@ class MyWindow(QMainWindow):
         self.is_displaying_marked_image = False # 标记当前是否显示的是带标记的图
 
     def setup_ui(self):
-        self.setWindowTitle("迈克尔逊干涉实验")
+        self.setWindowTitle("Kama")
         # 重新调整窗口大小以适应新布局，宽度可以小一些
         self.setGeometry(50, 50, 600, 600)
 
@@ -58,38 +59,64 @@ class MyWindow(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        # 主布局仍然是垂直的
+        # 主布局垂直
         self.main_layout = QVBoxLayout(self.central_widget)
         self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.main_layout.setSpacing(20)
         self.main_layout.setAlignment(Qt.AlignmentFlag.AlignTop) # 整体内容顶部对齐
 
-        # 1. 添加摄像头显示组件到主布局 (顶部)
+        #1. 创建一个容器来包装顶部布局
+        top_container = QFrame()
+        top_container.setObjectName("topContainer")  # 设置对象名
+        top_container.setFrameShape(QFrame.Shape.StyledPanel)
+        top_container.setStyleSheet("""
+            #topContainer {  /* 使用ID选择器，只选择特定对象 */
+                border: 1px solid red;
+                border-radius: 5px;
+            }
+        """)
+
+        # 1. ---创建顶部水平布局---
+        self.top_layout = QHBoxLayout(top_container)  # 将布局直接设置给容器
+        self.top_layout.setContentsMargins(10, 10, 10, 10)  # 设置内边距
+
+        # 添加组件到顶部布局
         self.camera_display = CameraDisplay()
-        # 让摄像头显示居中或靠左对齐
-        self.main_layout.addWidget(self.camera_display, alignment=Qt.AlignmentFlag.AlignHCenter) # 或 AlignLeft
+        self.figure_view = FigureView()
+        self.top_layout.addWidget(self.camera_display)
+        self.top_layout.addWidget(self.figure_view)
 
-        # 2. 创建底部水平布局 (用于放置 FunctionView 和 ConsoleView)
-        self.bottom_layout = QHBoxLayout()
-        self.bottom_layout.setSpacing(20)
+        # 将包含边框的容器添加到主布局
+        self.main_layout.addWidget(top_container)
 
-        # 3. 创建 FunctionView 和 ConsoleView
+        # 2. 创建一个容器来包装底部布局，与顶部容器相同
+        bottom_container = QFrame()
+        bottom_container.setObjectName("bottomContainer")  # 设置对象名
+        bottom_container.setFrameShape(QFrame.Shape.StyledPanel)
+        bottom_container.setStyleSheet("""
+            #bottomContainer {  /* 使用ID选择器，只选择特定对象 */
+                border: 1px solid red;
+                border-radius: 5px;
+            }
+        """)
+
+        # 创建底部水平布局并设置给容器
+        self.bottom_layout = QHBoxLayout(bottom_container)  # 将布局直接设置给容器
+        self.bottom_layout.setContentsMargins(10, 10, 10, 10)  # 设置内边距
+
+        # 添加组件到底部布局
         self.function_view = FunctionView(self)
         self.console_view = ConsoleView()
-
-        #添加日志管理器
-        log_manager.set_console_view(self.console_view)
-
-        #添加初始化日志信息
-        log_info("Console initialized.")
-        log_warning("Please connect the camera device first.")
-
-        # 4. 添加 FunctionView 和 ConsoleView 到水平布局
         self.bottom_layout.addWidget(self.function_view)
         self.bottom_layout.addWidget(self.console_view)
 
-        # 5. 将底部水平布局添加到主垂直布局
-        self.main_layout.addLayout(self.bottom_layout)
+        # 添加日志管理器
+        log_manager.set_console_view(self.console_view)
+        log_info("Console initialized.")
+        log_warning("Please connect the camera device first.")
+
+        # 将包含边框的底部容器添加到主布局
+        self.main_layout.addWidget(bottom_container)
 
         # 当点击自动检测按钮时，调用toggle_detection
         self.function_view.detect_circles_signal.connect(self.toggle_detection)

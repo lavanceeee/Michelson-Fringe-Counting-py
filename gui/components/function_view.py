@@ -1,10 +1,10 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QDialog
 from PyQt6.QtCore import Qt
 from core.log_manager import log_warning, log_info, log_error, log_debug
 from PyQt6.QtCore import pyqtSignal
 from gui.dialogs.manual_calibration_dialog import ManualCalibrationDialog
-class FunctionView(QWidget):
 
+class FunctionView(QWidget):
     #添加检测圆环的信号
     detect_circles_signal = pyqtSignal(bool)
 
@@ -19,17 +19,16 @@ class FunctionView(QWidget):
         self.is_detecting = False
         self._current_frame = None
 
+        #标定中心
+        self.current_center = [0, 0]
+
     def setup_ui(self):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
         # 设置功能区大小
-        self.setFixedSize(300, 250)
+        self.setFixedSize(250, 250)
         
         self.setStyleSheet("""
-            QWidget {
-                border: 2px solid #666666;
-                border-radius: 5px;
-            }
             QLabel#warningLabel {
                 color: #d9534f; 
                 font-size: 12px;
@@ -44,8 +43,8 @@ class FunctionView(QWidget):
         main_layout.setContentsMargins(10, 10, 20, 20) 
 
         # 创建水平布局用于按钮和警告文字
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(10)  # 设置按钮和文字之间的间距
+        first_line_layout = QHBoxLayout()
+        first_line_layout.setSpacing(10)  # 设置按钮和文字之间的间距
         
         # 创建按钮
         self.start_button = QPushButton("自动识别")
@@ -63,9 +62,15 @@ class FunctionView(QWidget):
         self.manual_button.setFixedSize(80, 30)
         self.manual_button.setFont(font)
 
+        # 开启检测按钮
+        self.start_detection_button = QPushButton("开启检测")
+        self.start_detection_button.setFixedSize(80, 30)
+        self.start_detection_button.setFont(font)
+
         # 初始状态禁用按钮
         self.start_button.setEnabled(False)
-        # self.manual_button.setEnabled(False)
+        self.manual_button.setEnabled(False)
+        self.start_detection_button.setEnabled(False)
 
         # 鼠标悬浮效果复用
         hover_style = """
@@ -80,16 +85,17 @@ class FunctionView(QWidget):
 
         self.start_button.setStyleSheet(hover_style)
         self.manual_button.setStyleSheet(hover_style)
+        self.start_detection_button.setStyleSheet(hover_style)
 
         # 添加控件到水平布局
-        button_layout.addWidget(self.start_button)
-        button_layout.addWidget(self.warning_label)
-        button_layout.addStretch()  # 添加弹性空间，使按钮和文字靠左对齐
+        first_line_layout.addWidget(self.start_button)
+        first_line_layout.addWidget(self.warning_label)
+        first_line_layout.addStretch()  # 添加弹性空间，使按钮和文字靠左对齐
 
         # 将水平布局添加到主布局
-        main_layout.addLayout(button_layout)
-        #垂直摆放手动识别按钮
+        main_layout.addLayout(first_line_layout)
         main_layout.addWidget(self.manual_button)
+        main_layout.addWidget(self.start_detection_button)
 
         # 设置布局
         self.setLayout(main_layout)
@@ -97,6 +103,7 @@ class FunctionView(QWidget):
         #连接点击开始检测按钮的点击事件
         self.start_button.clicked.connect(self.on_start_button_clicked)
         self.manual_button.clicked.connect(self.on_manual_button_clicked)
+        # self.start_detection_button.clicked.connect(self.on_start_detection_button_clicked)
 
     #自动检测被点击
     def on_start_button_clicked(self):
@@ -127,22 +134,23 @@ class FunctionView(QWidget):
 
             if self.is_detecting and self._current_frame:
 
-                log_info("1.-----_current_frame-----")
-                log_info(self._current_frame.width())
-                log_info(self._current_frame.height())
-                log_info("-----_current_frame-----")
-
-
                 #设置当前帧
                 self.manual_calibration_dialog.set_frame(self._current_frame)
                 
-                log_info("function_view | 进入手动定位圆心模式")
                 self.manual_calibration_dialog.show()
+
+                if self.manual_calibration_dialog.exec() == QDialog.DialogCode.Accepted:
+                    self.current_center = self.manual_calibration_dialog.xy_position
+                    log_debug(f"用户标定数据{self.current_center}成功存储到function_view")
             else:
                 log_info("退出手动定位圆心模式")
         except Exception as e:
             log_error(f"手动检测点击函数出错：{e}")
-    
+
+    # def on_start_detection_button_clicked(self):
+
+
+
     def set_camera_connected(self, is_connected):
         """根据摄像头连接状态设置按钮状态和提示标签可见性"""
         self.start_button.setEnabled(is_connected)

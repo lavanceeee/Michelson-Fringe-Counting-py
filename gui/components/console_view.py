@@ -11,14 +11,14 @@ class ConsoleView(QWidget):
 
     def setup_ui(self):
 
-        self.setFixedSize(600, 250)
+        self.setFixedSize(500, 250)
 
-        self.setStyleSheet("""
-            QWidget {
-                border: 2px solid #666666;
-                border-radius: 5px;
-            }
-        """)
+        # self.setStyleSheet("""
+        #     QWidget {
+        #         border: 2px solid #666666;
+        #         border-radius: 5px;
+        #     }
+        # """)
 
         # 创建布局
         layout = QVBoxLayout()
@@ -27,13 +27,12 @@ class ConsoleView(QWidget):
         layout.setSpacing(5)                         # 元素间距
 
         # 创建标题标签
-        self.title_label = QLabel("Terminal(Read Only)")
+        self.title_label = QLabel("Terminal")
 
-        # 创建分隔线
-        self.separator_line = QFrame()
-        self.separator_line.setFrameShape(QFrame.Shape.HLine)  # 设置为水平线
-        self.separator_line.setFrameShadow(QFrame.Shadow.Sunken) # 使用默认的阴影效果来显示线条
-
+        # # 创建分隔线
+        # self.separator_line = QFrame()
+        # self.separator_line.setFrameShape(QFrame.Shape.HLine)  # 设置为水平线
+        # self.separator_line.setFrameShadow(QFrame.Shadow.Sunken) # 使用默认的阴影效果来显示线条
 
         #创建日志文本区域
         self.log_text = QTextEdit()
@@ -50,7 +49,7 @@ class ConsoleView(QWidget):
 
         # 添加到布局
         layout.addWidget(self.title_label)
-        layout.addWidget(self.separator_line)
+        # layout.addWidget(self.separator_line)
         layout.addWidget(self.log_text)
 
         # 添加伸展项，保持内容在顶部
