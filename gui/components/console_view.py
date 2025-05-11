@@ -27,7 +27,7 @@ class ConsoleView(QWidget):
         layout.setSpacing(5)                         # 元素间距
 
         # 创建标题标签
-        self.title_label = QLabel("console log")
+        self.title_label = QLabel("Terminal(Read Only)")
 
         # 创建分隔线
         self.separator_line = QFrame()

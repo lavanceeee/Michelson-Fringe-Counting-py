@@ -56,19 +56,12 @@ class ManualCalibrationDialog(QDialog):
 
 #连接摄像头并显示画面
     def set_frame(self, pixmap):
-        log_debug("进入manual函数的update_frame")
 
         try:
             if pixmap is None:
                 log_error("update_frame | 传入是None")
                 return
             else:
-                log_debug("update_camera函数 | is not None")
-
-                log_info("2.-----pixmap-----")
-                log_info(pixmap.width())
-                log_info(pixmap.height())
-                log_info("-----pixmap-----")
 
                 self.frame_when_click = pixmap
 
@@ -88,64 +81,12 @@ class ManualCalibrationDialog(QDialog):
     2. 记录在数组
     """
     def mouse_move_event(self, event):
-        log_info("鼠标移动了，触发mouse_move_event函数")
-
-        label_width = self.frame_label.width()
-        label_height = self.frame_label.height()
         pixmap = self.frame_label.pixmap()
-        if pixmap:
-            img_width = pixmap.width()
-            img_height = pixmap.height()
-            log_info("-----")
-            log_info(f"图像尺寸: {img_width}x{img_height}")
-            log_info(f"组件的尺寸：{label_width}x{label_height}")
-            log_info("-----")
 
         #鼠标点击的相对位置，就是像素位置
         pos = event.pos()
         self.xy_position = [pos.x(), pos.y()]
 
-        log_info(f"鼠标坐标：x:{pos.x()}, y:{pos.y()}")
-
-        log_info(f"数组中的坐标确认：{self.xy_position[0]},{self.xy_position[1]}")
-
         if self.xy_position[0] != 0 and self.xy_position[1] != 0 and pixmap:
 
             self.frame_label.set_maker(pos)
-
-
-
-
-        
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
