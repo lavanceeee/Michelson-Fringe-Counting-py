@@ -14,6 +14,7 @@ from gui.components.console_view import ConsoleView
 from core.log_manager import log_manager, log_info, log_warning, log_error, log_debug
 from algorithm.circle_detector import CircleDetector
 from algorithm.cnn_circle_detector import load_inference_model
+from core.counts_detector import CountsDetector
 """
 创建一个主窗口类
 主窗口类，继承自QMainWindow
@@ -33,14 +34,20 @@ class MyWindow(QMainWindow):
         model_path = r"D:\SoftwareEngining\workAndHue\compatation\physics\write\pythonFileNewVer\models\model_weights\best_model.pth"
 
         log_info(f"从绝对路径 {model_path} 加载模型...")
+
         if load_inference_model(model_path):
              log_info("CNN 模型加载成功。")
         else:
-             log_error("!!!! CNN 模型加载失败，检测功能将不可用 !!!!")
+             log_error("CNN 模型加载失败，检测功能将不可用")
 
         # 创建检测定时器
         self.detection_timer = QTimer(self)
         self.detection_timer.timeout.connect(self.detect_circles) # 定时器触发时调用检测方法
+
+        #创建亮度检测定时器
+        self.brightness_timer = QTimer(self)
+        self.brightness_timer.setInterval(500)
+        self.brightness_timer.timeout.connect(self.update_brightness_detection)
 
         self.detection_start_time = None # 仅用于标记检测是否开启
         self.current_processed_frame = None # 存储当前处理后的帧 (可能不再需要，取决于预处理是否只在CNN内部做)
@@ -121,6 +128,16 @@ class MyWindow(QMainWindow):
         # 当点击自动检测按钮时，调用toggle_detection
         self.function_view.detect_circles_signal.connect(self.toggle_detection)
 
+        #连接开始数条纹的信号
+        self.function_view.start_count_signal.connect(self.toggle_light_count)
+
+        # 创建CountsDetector实例
+        self.counts_detector = CountsDetector()
+        
+        # 一次性连接信号
+        self.counts_detector.center_brightness_signal.connect(self.figure_view.update_point_data)
+        self.counts_detector.average_brightness_signal.connect(self.figure_view.init_average_brightness_data)
+
     def setup_camera(self):
         self.camera_controller = CameraController()
 
@@ -129,7 +146,7 @@ class MyWindow(QMainWindow):
         
         # 添加对摄像头连接状态的处理
         self.camera_controller.connection_lost.connect(self.handle_camera_disconnected)
-        
+
         # 连接预处理后的灰度图用于检测 (这行可能可以移除，如果预处理只在CNN内部做)
         # self.camera_controller.processed_frame_ready.connect(self.store_processed_frame)
 
@@ -219,6 +236,9 @@ class MyWindow(QMainWindow):
 
                 # 存储转换后的 OpenCV 帧 (NumPy 数组)
                 self.last_original_cv_frame = cv_frame_for_processing.copy() # 存储 NumPy 数组
+
+                # if self.counts_detector.start_signal:
+                #     self.counts_detector.update_frame(self.last_original_cv_frame)
 
                 # C. 更新显示 (仅在当前未显示标记图像时)
 
@@ -435,6 +455,27 @@ class MyWindow(QMainWindow):
             self.is_displaying_marked_image = False # 重置标记：现在显示的不是标记图了
         else:
              log_debug("恢复显示被跳过 (可能检测已停止或状态已改变)")
+
+
+    def toggle_light_count(self, is_start, center_list):
+        if is_start:
+            self.counts_detector.start_cout(center_list, self.last_original_cv_frame)
+            self.brightness_timer.start()
+        else:
+            self.counts_detector.start_signal = False
+            #清空第一帧
+            self.counts_detector.first_frame = None
+            #清空当前帧
+            self.counts_detector.current_frame = None
+            #清空中心点
+            self.counts_detector.center_pos = [0,0]
+            #清空时间
+            self.counts_detector.update_time = 0
+
+    def update_brightness_detection(self):
+        """每1000ms触发一次的亮度检测"""
+        if self.counts_detector.start_signal and self.last_original_cv_frame is not None:
+            self.counts_detector.update_frame(self.last_original_cv_frame)
 
 # 程序入口
 if __name__ == "__main__":

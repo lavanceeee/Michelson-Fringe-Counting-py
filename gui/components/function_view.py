@@ -1,12 +1,14 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QDialog
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from core.log_manager import log_warning, log_info, log_error, log_debug
-from PyQt6.QtCore import pyqtSignal
 from gui.dialogs.manual_calibration_dialog import ManualCalibrationDialog
 
 class FunctionView(QWidget):
     #添加检测圆环的信号
     detect_circles_signal = pyqtSignal(bool)
+
+    #开始数条纹的信号
+    start_count_signal = pyqtSignal(bool, list)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -17,6 +19,7 @@ class FunctionView(QWidget):
         self.setup_ui()
         
         self.is_detecting = False
+        self.is_brightness_detecting = False #开始数条纹
         self._current_frame = None
 
         #标定中心
@@ -67,6 +70,8 @@ class FunctionView(QWidget):
         self.start_detection_button.setFixedSize(80, 30)
         self.start_detection_button.setFont(font)
 
+
+
         # 初始状态禁用按钮
         self.start_button.setEnabled(False)
         self.manual_button.setEnabled(False)
@@ -103,7 +108,7 @@ class FunctionView(QWidget):
         #连接点击开始检测按钮的点击事件
         self.start_button.clicked.connect(self.on_start_button_clicked)
         self.manual_button.clicked.connect(self.on_manual_button_clicked)
-        # self.start_detection_button.clicked.connect(self.on_start_detection_button_clicked)
+        self.start_detection_button.clicked.connect(self.on_start_detection_button_clicked)
 
     #自动检测被点击
     def on_start_button_clicked(self):
@@ -142,14 +147,26 @@ class FunctionView(QWidget):
                 if self.manual_calibration_dialog.exec() == QDialog.DialogCode.Accepted:
                     self.current_center = self.manual_calibration_dialog.xy_position
                     log_debug(f"用户标定数据{self.current_center}成功存储到function_view")
+
+                    self.start_detection_button.setEnabled(True)
             else:
                 log_info("退出手动定位圆心模式")
         except Exception as e:
             log_error(f"手动检测点击函数出错：{e}")
 
-    # def on_start_detection_button_clicked(self):
+    def on_start_detection_button_clicked(self):
+        #属性查询
+        self.is_brightness_detecting = not getattr(self, 'is_brightness_detecting', False)
 
+        if self.is_brightness_detecting:
+            self.start_detection_button.setText("停止数条纹")
+            log_info("开始数条纹进程")
+        else:
+            self.start_detection_button.setText("开始数条纹")
+            log_warning("手动停止数条纹进程")
 
+        #发送信号
+        self.start_count_signal.emit(self.is_brightness_detecting, self.current_center)
 
     def set_camera_connected(self, is_connected):
         """根据摄像头连接状态设置按钮状态和提示标签可见性"""
