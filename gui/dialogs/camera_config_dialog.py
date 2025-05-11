@@ -34,6 +34,8 @@ class CameraConfigDialog(QDialog):
         port_layout = QHBoxLayout()
         port_label = QLabel("DroidCam Port:")
         self.port_input = QLineEdit()
+        #设置默认值
+        self.port_input.setText("4747")
         self.port_input.setPlaceholderText("请输入端口号：")
         port_layout.addWidget(port_label)
         port_layout.addWidget(self.port_input)
