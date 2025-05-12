@@ -11,8 +11,6 @@ class CameraController(QObject):
     #QImage不能接受None，导致程序异常，改成object
     frame_ready = pyqtSignal(object)
     connection_lost = pyqtSignal()  # 添加新的信号用于通知连接断开
-    #用于圆环检测
-    # raw_frame_ready = pyqtSignal(object)
 
     #拿到预处理后的图像
     processed_frame_ready = pyqtSignal(object) 
@@ -48,21 +46,14 @@ class CameraController(QObject):
 
                     #预处理
                     blurred = preprocess_for_circle_detection(frame)
-
-                    #将原始图像保存到raw_frame_ready信号中
-                    #原先是发送frame,现在发送result_image
-                    # self.raw_frame_ready.emit(blurred)
-
-                    # if blurred is not None:
-                    #     #发送预处理后的图像
-                    #     self.processed_frame_ready.emit(blurred)
                     
                     if blurred is not None:
                         h, w = blurred.shape
-                        qt_image = QImage(blurred.data, w, h, w, QImage.Format.Format_Grayscale8)
+                        #fix:需要的是字节步长， w*1
+                        qt_image = QImage(blurred.data, w, h, w*1, QImage.Format.Format_Grayscale8)
                         self.frame_ready.emit(qt_image)
-                        #frame_ready信号发送处理后的图像
 
+                        #frame_ready信号发送处理后的图像
                         self.processed_frame_ready.emit(blurred)
                 else:
                     log_error("Camera disconnected.")

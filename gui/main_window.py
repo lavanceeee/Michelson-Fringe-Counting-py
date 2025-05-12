@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout, QFrame
 from PyQt6.QtCore import Qt, QTimer, QDateTime
-from PyQt6.QtGui import QPixmap, QImage
+from PyQt6.QtGui import QPixmap, QImage, QPainter, QPen, QColor
 from gui.components.figure_view import FigureView
 from gui.menu_bar import MenuBarManger
 from gui.components.camera_view import CameraDisplay
@@ -40,13 +40,15 @@ class MyWindow(QMainWindow):
         else:
              log_error("CNN 模型加载失败，检测功能将不可用")
 
+        self.current_position = [0, 0]
+
         # 创建检测定时器
         self.detection_timer = QTimer(self)
         self.detection_timer.timeout.connect(self.detect_circles) # 定时器触发时调用检测方法
 
         #创建亮度检测定时器
         self.brightness_timer = QTimer(self)
-        self.brightness_timer.setInterval(500)
+        self.brightness_timer.setInterval(800)
         self.brightness_timer.timeout.connect(self.update_brightness_detection)
 
         self.detection_start_time = None # 仅用于标记检测是否开启
@@ -55,6 +57,7 @@ class MyWindow(QMainWindow):
         # 添加一个变量来存储最后显示的未标记图像
         self.last_unmarked_pixmap = None
         self.is_displaying_marked_image = False # 标记当前是否显示的是带标记的图
+        self.orignal_qimage = None
 
     def setup_ui(self):
         self.setWindowTitle("Kama")
@@ -179,6 +182,7 @@ class MyWindow(QMainWindow):
                 #    需要处理不同的 QImage 格式
                 image_copy = image.copy() # 操作副本以防修改原始 QImage
                 qimage_format = image_copy.format()
+                self.orignal_qimage = image
 
                 if image_copy.isNull():
                     log_error("接收到的 QImage 是空的")
@@ -248,6 +252,9 @@ class MyWindow(QMainWindow):
                 if not is_detecting or not self.is_displaying_marked_image:
                     self.camera_display.setPixmap(self.last_unmarked_pixmap) # 使用存储的 pixmap
 
+                    #标定一次当前帧的圆心
+                    self.mark_center(self.last_unmarked_pixmap)
+
                 # D. 更新连接状态
                 #使得自动检测按钮可以点击
                 self.function_view.set_camera_connected(True)
@@ -261,7 +268,6 @@ class MyWindow(QMainWindow):
                  self.function_view.set_camera_connected(False)
                  self.last_unmarked_pixmap = None
                  self.last_original_cv_frame = None
-
         else:
             # 如果 image 不是 None 也不是 QImage，记录一个错误
             log_error(f"在 update_frame 中接收到意外的帧类型: {type(image)}")
@@ -459,8 +465,12 @@ class MyWindow(QMainWindow):
 
     def toggle_light_count(self, is_start, center_list):
         if is_start:
-            self.counts_detector.start_cout(center_list, self.last_original_cv_frame)
+            self.current_position = center_list
+            #传递Qimage格式
+            self.counts_detector.start_cout(center_list, self.orignal_qimage)
             self.brightness_timer.start()
+
+            log_debug(f"在主函数的即将传递的坐标是：{center_list[0]} and {center_list[1]}---")
         else:
             self.counts_detector.start_signal = False
             #清空第一帧
@@ -472,10 +482,27 @@ class MyWindow(QMainWindow):
             #清空时间
             self.counts_detector.update_time = 0
 
+    def mark_center(self, marked_frame):
+        # 标定一次当前帧的圆心
+        painter = QPainter(marked_frame)
+
+        pen = QPen(QColor(255, 0, 0))  # 红色
+        pen.setWidth(2)  # 设置边框宽度
+        painter.setPen(pen)
+
+        painter.drawLine(self.current_position[0] - 10, self.current_position[1], self.current_position[0] + 10, self.current_position[1])
+        painter.drawLine(self.current_position[0], self.current_position[1] - 10, self.current_position[0], self.current_position[1] + 10)
+
+        painter.end()
+        self.camera_display.setPixmap(marked_frame)
+
     def update_brightness_detection(self):
-        """每1000ms触发一次的亮度检测"""
-        if self.counts_detector.start_signal and self.last_original_cv_frame is not None:
-            self.counts_detector.update_frame(self.last_original_cv_frame)
+        """
+        每1000ms触发一次的亮度检测
+        直接发送原始pixmap
+        """
+        if self.counts_detector.start_signal:
+            self.counts_detector.update_frame(self.orignal_qimage)
 
 # 程序入口
 if __name__ == "__main__":
