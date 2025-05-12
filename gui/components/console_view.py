@@ -13,13 +13,6 @@ class ConsoleView(QWidget):
 
         self.setFixedSize(500, 250)
 
-        # self.setStyleSheet("""
-        #     QWidget {
-        #         border: 2px solid #666666;
-        #         border-radius: 5px;
-        #     }
-        # """)
-
         # 创建布局
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignTop) # 内容顶部对齐
