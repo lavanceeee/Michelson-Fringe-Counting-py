@@ -20,40 +20,18 @@ class MenuBarManger:
              这个方法作为菜单设置的入口点，组织所有菜单的创建过程
         """
 
-        #设置菜单栏的样式
-        self.menubar.setStyleSheet("""
-            QMenuBar{
-                background-color: white;
-                color:black;
-                border-bottom: 1px solid #808080;
-                }
-            QMenuBar::item{
-                background-color: white;
-                padding: 5px 10px;
-                color:black;
-                }
-            QMenuBar::item:selected {
-                background-color: #8a9a9a;
-                transition: background-color 0.3s ease-out;
-                }
-            QMenuBar::item:hover {
-                background-color: #8a9a9a;
-                transition: background-color 0.3s ease-in;
-                }
-            QMenuBar::item:disabled {
-                background-color: #8a9a9a;
-                transition: background-color 0.3s ease-in;
-                }
-        """)
-
-
         #创建配置菜单
         self.config_menu = self.create_config_menu()
+
+        #数据项菜单
+        self.data_menu = self.create_data_menu()
+
         #创建帮助菜单
         self.help_menu = self.create_help_menu()
 
         #将配置菜单和帮助菜单添加到主窗口的菜单栏中
         self.menubar.addMenu(self.config_menu)
+        self.menubar.addMenu(self.data_menu)
         self.menubar.addMenu(self.help_menu)
 
     def create_config_menu(self):
@@ -62,16 +40,19 @@ class MenuBarManger:
               :return: 配置菜单对象
         """
         # 创建配置菜单，'配置'是显示在菜单栏上的文本
-        config_menu = QMenu('配置',self.menubar)
+        camera_config = QMenu('摄像头配置',self.menubar)
 
-        # 创建设置动作（菜单项）
-        settings_action = QAction('配置摄像头IP', self.main_window)
-        # 将动作的触发信号连接到主窗口的show_settings方法
-        settings_action.triggered.connect(self.show_camera_config)
+        ip_connect_action = QAction('连接到DroidCam', self.main_window)
+        self_connect_action = QAction('连接到USB摄像头',self.main_window)
+
+
+        ip_connect_action.triggered.connect(self.show_camera_config)
+
         # 将动作添加到配置菜单中
-        config_menu.addAction(settings_action)
+        camera_config.addAction(ip_connect_action)
+        camera_config.addAction(self_connect_action)
 
-        return config_menu
+        return camera_config
 
     def show_camera_config(self):
         """
@@ -88,26 +69,33 @@ class MenuBarManger:
             else:
                 log_error("connect camera failed")
 
+    def create_data_menu(self):
+        data_menu = QMenu('数据处理', self.menubar)
+
+        #选项
+        data_view_action =  QAction('数据查看', self.main_window)
+        data_export_action = QAction('数据导出', self.main_window)
+
+        # 将动作添加到菜单中
+        data_menu.addAction(data_view_action)
+        data_menu.addAction(data_export_action)
+
+        return data_menu
+
     def create_help_menu(self):
         """
         创建帮助菜单及其子项
         :return: 帮助菜单对象
         """
         # 创建帮助菜单
-        help_menu = QMenu('帮助', self.menubar)
+        help_menu = QMenu('帮助说明', self.menubar)
 
-        # 创建关于动作（菜单项）
-        about_action = QAction('关于', self.main_window)
-        # 将动作的触发信号连接到主窗口的show_about方法
-        about_action.triggered.connect(self.main_window.show_about)
-        # 将动作添加到帮助菜单中
-        help_menu.addAction(about_action)
+        project_website_action = QAction('项目官网',self.main_window)
+        help_view_action = QAction('使用文档', self.main_window)
+        project_address_action = QAction('项目地址', self.main_window)
+
+        help_menu.addAction(project_website_action)
+        help_menu.addAction(help_view_action)
+        help_menu.addAction(project_address_action)
 
         return help_menu
-
-
-
-
-
-
-

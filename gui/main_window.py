@@ -150,9 +150,6 @@ class MyWindow(QMainWindow):
         # 添加对摄像头连接状态的处理
         self.camera_controller.connection_lost.connect(self.handle_camera_disconnected)
 
-        # 连接预处理后的灰度图用于检测 (这行可能可以移除，如果预处理只在CNN内部做)
-        # self.camera_controller.processed_frame_ready.connect(self.store_processed_frame)
-
     def update_frame(self, image): # 输入可能是 QImage 或 None
         # 1. 首先处理 None 的情况
         if image is None:
@@ -168,13 +165,8 @@ class MyWindow(QMainWindow):
         if isinstance(image, QImage):
             try:
                 # A. 直接使用接收到的 QImage 创建用于显示的 Pixmap
-                pixmap = QPixmap.fromImage(image) # 直接使用输入的 QImage
-                #缩放和平滑处理
-                # scaled_pixmap = pixmap.scaled(
-                #     self.camera_display.size(),
-                #     Qt.AspectRatioMode.KeepAspectRatio,
-                #     Qt.TransformationMode.SmoothTransformation
-                # )
+                pixmap = QPixmap.fromImage(image) 
+
                 self.last_unmarked_pixmap = pixmap # 存储用于显示的 pixmap
                 self.function_view.current_frame(pixmap)
                 
@@ -277,11 +269,6 @@ class MyWindow(QMainWindow):
             self.last_unmarked_pixmap = None
             self.last_original_cv_frame = None
 
-    def store_processed_frame(self, blurred):
-        # 存储灰度图用于后续检测
-        # (这个方法可能不再需要，如果所有处理都在 process_opencv_frame 中完成)
-        self.current_processed_frame = blurred
-
     def handle_camera_disconnected(self):
         """摄像头断开连接时的处理"""
         log_debug("handle_camera_disconnected被调用")
@@ -293,9 +280,9 @@ class MyWindow(QMainWindow):
             log_warning("停止检测，因为摄像头断开")
         
         self.detection_start_time = None
-        self.current_processed_frame = None # 清除存储的帧
-        self.last_original_cv_frame = None # <--- 新增：清除原始帧
-        # CircleDetector.last_position = None # 如果 CircleDetector 中还有这个变量，也应重置
+        self.current_processed_frame = None
+        self.last_original_cv_frame = None
+        # CircleDetector.last_position = None
         self.last_unmarked_pixmap = None
         self.is_displaying_marked_image = False # 重置标记
 
@@ -337,8 +324,6 @@ class MyWindow(QMainWindow):
             if self.detection_timer.isActive():
                 self.detection_timer.stop() 
                 log_debug("Detection timer stopped.")
-            # 重置检测器状态 (如果 CircleDetector 中有需要重置的状态)
-            # CircleDetector.last_position = None
             
             # *** 停止后，恢复显示最后一次收到的未标记图像 ***
             if self.last_unmarked_pixmap:
@@ -501,10 +486,3 @@ class MyWindow(QMainWindow):
         """
         if self.counts_detector.start_signal:
             self.counts_detector.update_frame(self.orignal_qimage)
-
-# 程序入口
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MyWindow()
-    window.show()
-    sys.exit(app.exec())
