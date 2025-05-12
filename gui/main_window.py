@@ -298,10 +298,6 @@ class MyWindow(QMainWindow):
         # CircleDetector.last_position = None # 如果 CircleDetector 中还有这个变量，也应重置
         self.last_unmarked_pixmap = None
         self.is_displaying_marked_image = False # 重置标记
-        
-        # (可选) 清空显示区域，而不是显示最后收到的None
-        # self.camera_display.clear()
-        # self.camera_display.setText("摄像头已断开")
 
     def show_about(self):
         """显示关于对话框"""
@@ -481,6 +477,8 @@ class MyWindow(QMainWindow):
             self.counts_detector.center_pos = [0,0]
             #清空时间
             self.counts_detector.update_time = 0
+            #结束定时器
+            self.brightness_timer.stop()
 
     def mark_center(self, marked_frame):
         # 标定一次当前帧的圆心
@@ -499,7 +497,7 @@ class MyWindow(QMainWindow):
     def update_brightness_detection(self):
         """
         每1000ms触发一次的亮度检测
-        直接发送原始pixmap
+        直接发送原始Qimage
         """
         if self.counts_detector.start_signal:
             self.counts_detector.update_frame(self.orignal_qimage)
