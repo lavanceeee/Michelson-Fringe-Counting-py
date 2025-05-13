@@ -4,6 +4,7 @@ from PyQt6.QtGui import QAction  # 从QtGui导入QAction
 from PyQt6.QtWidgets import QDialog
 from gui.dialogs.camera_config_dialog import CameraConfigDialog
 from core.log_manager import log_info, log_error
+from gui.dialogs.data_view_dialog import DataViewDialog
 
 class MenuBarManger:
     def __init__(self, main_window):
@@ -80,7 +81,33 @@ class MenuBarManger:
         data_menu.addAction(data_view_action)
         data_menu.addAction(data_export_action)
 
+        #连接数据查看
+        data_view_action.triggered.connect(self.show_data_view)
+
         return data_menu
+    
+    def show_data_view(self):
+
+        #拿主窗口的FigureView
+        main_window_figure_view = self.main_window.figure_view
+        
+        #FigureView的数据
+        average_brightness = main_window_figure_view.average_brightness
+        center_brightness_save = main_window_figure_view.center_brightness_save.copy()
+        time_data = main_window_figure_view.time_save.copy()
+
+        #创建显示窗口并接受数据
+        data_view_dialog = DataViewDialog(parent=self.main_window, 
+                                        average_brightness=average_brightness, 
+                                        center_brightness_save=center_brightness_save, 
+                                        time_save=time_data)
+        data_view_dialog.show()
+
+
+
+        
+
+        
 
     def create_help_menu(self):
         """

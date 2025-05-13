@@ -18,7 +18,6 @@ class FigureView(QWidget):
         self.center_brightness_save = []
         self.time_save = []
 
-
     def setup_ui(self):
         #设置背景
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)

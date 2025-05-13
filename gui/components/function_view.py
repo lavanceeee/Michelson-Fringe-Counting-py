@@ -1,5 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QDialog
 from PyQt6.QtCore import Qt, pyqtSignal
+from pyqtgraph.examples.MatrixDisplayExample import main_window
+
 from core.log_manager import log_warning, log_info, log_error, log_debug
 from gui.dialogs.manual_calibration_dialog import ManualCalibrationDialog
 
@@ -38,6 +40,12 @@ class FunctionView(QWidget):
                 border: none; 
                 margin-left: 5px; 
             }
+            QLabel#data_analyse_label {
+                color: #d9534f; 
+                font-size: 12px;
+                border: none; 
+                margin-left: 5px; 
+            }
         """)
 
         # 创建主布局 (垂直)
@@ -45,7 +53,7 @@ class FunctionView(QWidget):
         main_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft) 
         main_layout.setContentsMargins(10, 10, 20, 20) 
 
-        # 创建水平布局用于按钮和警告文字
+        # 1.自动检测 创建水平布局用于按钮和警告文字
         first_line_layout = QHBoxLayout()
         first_line_layout.setSpacing(10)  # 设置按钮和文字之间的间距
         
@@ -60,7 +68,12 @@ class FunctionView(QWidget):
         self.warning_label = QLabel("请先传入干涉图像")
         self.warning_label.setObjectName("warningLabel")  # 设置对象名，便于应用样式
 
-        # 手动识别按钮
+        # 添加控件到水平布局
+        first_line_layout.addWidget(self.start_button)
+        first_line_layout.addWidget(self.warning_label)
+        first_line_layout.addStretch()  # 添加弹性空间，使按钮和文字靠左对齐
+
+        # 2. 手动识别按钮
         self.manual_button = QPushButton("手动识别")
         self.manual_button.setFixedSize(80, 30)
         self.manual_button.setFont(font)
@@ -70,7 +83,13 @@ class FunctionView(QWidget):
         self.start_detection_button.setFixedSize(80, 30)
         self.start_detection_button.setFont(font)
 
+        #数据导出按钮
+        self.data_analyse_label = QLabel("本次统计已结束，可以查看详细数据并导出")
+        self.data_analyse_label.setObjectName("data_analyse_label")
+        
 
+        #初始时不可见
+        self.data_analyse_label.setVisible(False)
 
         # 初始状态禁用按钮
         self.start_button.setEnabled(False)
@@ -92,15 +111,11 @@ class FunctionView(QWidget):
         self.manual_button.setStyleSheet(hover_style)
         self.start_detection_button.setStyleSheet(hover_style)
 
-        # 添加控件到水平布局
-        first_line_layout.addWidget(self.start_button)
-        first_line_layout.addWidget(self.warning_label)
-        first_line_layout.addStretch()  # 添加弹性空间，使按钮和文字靠左对齐
-
         # 将水平布局添加到主布局
         main_layout.addLayout(first_line_layout)
         main_layout.addWidget(self.manual_button)
         main_layout.addWidget(self.start_detection_button)
+        main_layout.addWidget(self.data_analyse_label)
 
         # 设置布局
         self.setLayout(main_layout)
@@ -119,10 +134,10 @@ class FunctionView(QWidget):
         self.is_detecting = not self.is_detecting
         if self.is_detecting:
             self.start_button.setText("停止识别")
-            log_info("开始识别圆环")
+            log_info("开始自动识别圆环")
         else:
             self.start_button.setText("开启识别")
-            log_warning("手动停止识别")
+            log_warning("手动停止自动识别")
 
         self.detect_circles_signal.emit(self.is_detecting)
 
@@ -146,11 +161,15 @@ class FunctionView(QWidget):
 
                 if self.manual_calibration_dialog.exec() == QDialog.DialogCode.Accepted:
                     self.current_center = self.manual_calibration_dialog.xy_position
+
+
                     log_debug(f"用户标定数据{self.current_center}成功存储到function_view")
 
                     self.start_detection_button.setEnabled(True)
             else:
                 log_info("退出手动定位圆心模式")
+
+
         except Exception as e:
             log_error(f"手动检测点击函数出错：{e}")
 
@@ -159,11 +178,16 @@ class FunctionView(QWidget):
         self.is_brightness_detecting = not getattr(self, 'is_brightness_detecting', False)
 
         if self.is_brightness_detecting:
+            
             self.start_detection_button.setText("停止数条纹")
+
             log_info("开始数条纹进程")
         else:
             self.start_detection_button.setText("开始数条纹")
+
             log_warning("手动停止数条纹进程")
+
+            self.data_analyse_label.setVisible(True)
 
         #发送信号
         self.start_count_signal.emit(self.is_brightness_detecting, self.current_center)
@@ -173,4 +197,6 @@ class FunctionView(QWidget):
         self.start_button.setEnabled(is_connected)
         self.manual_button.setEnabled(is_connected)
         self.warning_label.setVisible(not is_connected)  # 当摄像头连接时隐藏警告
+
+
 

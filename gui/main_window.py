@@ -446,8 +446,11 @@ class MyWindow(QMainWindow):
 
     def toggle_light_count(self, is_start, center_list):
         if is_start:
+
+            #中心坐标
             self.current_position = center_list
-            #传递Qimage格式
+
+            #传递QImage格式
             self.counts_detector.start_cout(center_list, self.orignal_qimage)
             self.brightness_timer.start()
 
@@ -486,3 +489,9 @@ class MyWindow(QMainWindow):
         """
         if self.counts_detector.start_signal:
             self.counts_detector.update_frame(self.orignal_qimage)
+            
+if __name__ == "__main__":
+    app = QApplication([])
+    main_window = MyWindow()
+    main_window.show()
+    app.exec()

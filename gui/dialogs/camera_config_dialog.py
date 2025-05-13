@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout,
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QDialogButtonBox
 
-class CameraConfigDialog(QDialog):
+class CameraConfigDialog(QDialog): 
     """
     DroidCam摄像头配置对话框类
     摄像头IP配置相关的UI和逻辑
