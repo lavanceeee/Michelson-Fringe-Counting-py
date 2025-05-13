@@ -1,7 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QDialog
 from PyQt6.QtCore import Qt, pyqtSignal
-from pyqtgraph.examples.MatrixDisplayExample import main_window
-
 from core.log_manager import log_warning, log_info, log_error, log_debug
 from gui.dialogs.manual_calibration_dialog import ManualCalibrationDialog
 

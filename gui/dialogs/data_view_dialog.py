@@ -26,7 +26,7 @@ class DataViewDialog(QDialog):
 
     def setup_ui(self):
         self.setWindowTitle("数据查看")
-        self.setFixedSize(800, 600)
+        self.setFixedSize(800, 400)
 
         #主功能区域
 
@@ -36,6 +36,9 @@ class DataViewDialog(QDialog):
 
         #1.1 左侧的图表显示
         self.plot_widget = pg.PlotWidget()
+        self.plot_widget.setBackground('w')
+        #size
+        self.plot_widget.setFixedSize(500, 250)
         self.first_line_layout.addWidget(self.plot_widget)
 
         #1.2 右侧的数据展示区域
