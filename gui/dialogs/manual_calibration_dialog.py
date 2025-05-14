@@ -12,8 +12,6 @@ class ManualCalibrationDialog(QDialog):
 
         super().__init__(parent)
 
-        log_debug("手动标定对话框被创建")
-
         self.frame_label = None #声明frame_label
 
         #定义坐标数组于setup_ui上面

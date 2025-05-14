@@ -76,7 +76,6 @@ class FigureView(QWidget):
     def update_point_data(self, brightness, time):
 
         log_info("----进入组件更新点数据----")
-        log_info(f"当前平均亮度: {self.average_brightness}")
         log_info(f"当前中心亮度: {brightness}")
         log_info(f"当前时间: {time}")
 

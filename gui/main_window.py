@@ -48,7 +48,7 @@ class MyWindow(QMainWindow):
 
         #创建亮度检测定时器
         self.brightness_timer = QTimer(self)
-        self.brightness_timer.setInterval(800)
+        self.brightness_timer.setInterval(100)
         self.brightness_timer.timeout.connect(self.update_brightness_detection)
 
         self.detection_start_time = None # 仅用于标记检测是否开启
@@ -450,12 +450,12 @@ class MyWindow(QMainWindow):
             #中心坐标
             self.current_position = center_list
 
-            #传递QImage格式
-            self.counts_detector.start_cout(center_list, self.orignal_qimage)
+            self.counts_detector.start_cout(center_list)
             self.brightness_timer.start()
 
             log_debug(f"在主函数的即将传递的坐标是：{center_list[0]} and {center_list[1]}---")
         else:
+
             self.counts_detector.start_signal = False
             #清空第一帧
             self.counts_detector.first_frame = None
@@ -485,9 +485,11 @@ class MyWindow(QMainWindow):
     def update_brightness_detection(self):
         """
         每1000ms触发一次的亮度检测
-        直接发送原始Qimage
+        直接发送原始QImage
         """
+
         if self.counts_detector.start_signal:
+
             self.counts_detector.update_frame(self.orignal_qimage)
             
 if __name__ == "__main__":

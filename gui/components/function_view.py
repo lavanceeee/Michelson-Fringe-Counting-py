@@ -160,7 +160,6 @@ class FunctionView(QWidget):
                 if self.manual_calibration_dialog.exec() == QDialog.DialogCode.Accepted:
                     self.current_center = self.manual_calibration_dialog.xy_position
 
-
                     log_debug(f"用户标定数据{self.current_center}成功存储到function_view")
 
                     self.start_detection_button.setEnabled(True)
@@ -182,6 +181,9 @@ class FunctionView(QWidget):
             log_info("开始数条纹进程")
         else:
             self.start_detection_button.setText("开始数条纹")
+
+            self.is_detecting = False
+            log_debug(f"is_detecting: {self.is_detecting}")
 
             log_warning("手动停止数条纹进程")
 

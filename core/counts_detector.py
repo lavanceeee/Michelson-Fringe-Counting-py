@@ -22,33 +22,24 @@ class CountsDetector(QObject): #继承QObject支持信号槽
 
         self.average_brightness = 0
 
+        self.center_pos_array = []
+
         #临时的更新时间
         self.update_time = 0
 
-    def start_cout(self, center_list, first_frame):
+    def start_cout(self, center_list):
         #开始检测
         self.start_signal = True
 
         self.center_pos = center_list
 
-        #转换为numpy数组
-        frame = ImageConverter.image2numpyArray(first_frame)
-
-        self.average_brightness = np.mean(frame)
-
-        #保留两位小数
-        self.average_brightness = round(self.average_brightness, 2)
-
-        #发送信号
-        self.average_brightness_signal.emit(self.average_brightness)
-
     #更新帧率
     #frame 为QImage
-    def update_frame(self, Qimage_frame):
-        self.current_frame = Qimage_frame
+    def update_frame(self, qimage_frame):
+        self.current_frame = qimage_frame
 
         #转换为numpy数组
-        frame = ImageConverter.image2numpyArray(Qimage_frame)
+        frame = ImageConverter.image2numpyArray(qimage_frame)
 
         if len(frame.shape) == 2:  # 灰度图
             brightness = frame[self.center_pos[1], self.center_pos[0]]
@@ -60,9 +51,11 @@ class CountsDetector(QObject): #继承QObject支持信号槽
         #转换为小数并保留两位
         brightness = round(float(brightness), 2)
 
+        self.center_pos_array.append(brightness)
+
         self.update_time += 1
         
-        # 发送转换后的浮点数
+        # 实时发送数组坐标并渲染
         self.center_brightness_signal.emit(brightness, self.update_time)
 
 

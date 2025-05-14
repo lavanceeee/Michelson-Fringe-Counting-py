@@ -1,27 +1,36 @@
+import numpy as np
+from scipy import ndimage
+
+from core.log_manager import log_debug
+
 
 class FigureN:
 
     @staticmethod
-    def figureN(average_brightness, center_brightness_save):
+    def figureN(center_brightness_save):
+        # 将数据转换为numpy数组以便处理
+        brightness_array = np.array(center_brightness_save)
         
-        total_points = len(center_brightness_save)
-
-        #亮度阈值
-        threshold = average_brightness
-
-        #计数
+        # 应用高斯平滑，类似MATLAB的smoothdata
+        # sigma=10对应MATLAB中的窗口大小
+        smoothed_data = ndimage.gaussian_filter1d(brightness_array, sigma=5)
+        
+        # 计算平滑后数据的平均值作为阈值
+        threshold = np.mean(smoothed_data)
+        
+        # 计数穿越
         crossings = 0
-
-        above_threshold = center_brightness_save[0] > threshold
-
-        for i in range(1, total_points):
-            current_above = center_brightness_save[i] > threshold
+        above_threshold = smoothed_data[0] > threshold
+        
+        for i in range(1, len(smoothed_data)):
+            current_above = smoothed_data[i] > threshold
             if current_above != above_threshold:
                 crossings += 1
-                current_above = above_threshold
-
-        N = crossings / 2
-        return N
+                above_threshold = current_above
+                
+        N = int(crossings / 2)
+        log_debug(f"计算出来的N是{N}")
+        return N, threshold
         
 
 

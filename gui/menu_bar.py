@@ -1,15 +1,20 @@
 from PyQt6.QtWidgets import (QMenuBar, QMenu, QToolBar,
                              QFileDialog)
-from PyQt6.QtGui import QAction  # 从QtGui导入QAction
+from PyQt6.QtGui import QAction  
 from PyQt6.QtWidgets import QDialog
 from gui.dialogs.camera_config_dialog import CameraConfigDialog
 from core.log_manager import log_info, log_error
 from gui.dialogs.data_view_dialog import DataViewDialog
+from core.log_manager import log_info
+from core.service.video_counter import VideoCounter
 
 class MenuBarManger:
     def __init__(self, main_window):
         # 保存主窗口引用，用于后续操作
         self.main_window = main_window
+
+        #初始化视频计数器
+        self.video_counter = VideoCounter(self.main_window)
         # 获取主窗口的菜单栏对象
         self.menubar = main_window.menuBar()
         # 调用设置菜单的方法
@@ -21,6 +26,9 @@ class MenuBarManger:
              这个方法作为菜单设置的入口点，组织所有菜单的创建过程
         """
 
+        #文件菜单
+        self.file_menu = self.create_file_menu()
+
         #创建配置菜单
         self.config_menu = self.create_config_menu()
 
@@ -31,10 +39,27 @@ class MenuBarManger:
         self.help_menu = self.create_help_menu()
 
         #将配置菜单和帮助菜单添加到主窗口的菜单栏中
+        self.menubar.addMenu(self.file_menu)
         self.menubar.addMenu(self.config_menu)
         self.menubar.addMenu(self.data_menu)
         self.menubar.addMenu(self.help_menu)
 
+    def create_file_menu(self):
+        """
+        创建文件菜单及其子项
+        :return: 文件菜单对象
+        """
+        file_menu = QMenu('文件', self.menubar)
+
+        #子菜单项
+        video_select_action = QAction('视频选择', self.main_window)
+        video_select_action.triggered.connect(self.video_counter.show_video_select)
+
+        #将动作添加到菜单中
+        file_menu.addAction(video_select_action)
+
+        return file_menu
+        
     def create_config_menu(self):
         """
               创建配置菜单及其子项
@@ -92,22 +117,14 @@ class MenuBarManger:
         main_window_figure_view = self.main_window.figure_view
         
         #FigureView的数据
-        average_brightness = main_window_figure_view.average_brightness
         center_brightness_save = main_window_figure_view.center_brightness_save.copy()
         time_data = main_window_figure_view.time_save.copy()
 
         #创建显示窗口并接受数据
         data_view_dialog = DataViewDialog(parent=self.main_window, 
-                                        average_brightness=average_brightness, 
                                         center_brightness_save=center_brightness_save, 
                                         time_save=time_data)
         data_view_dialog.show()
-
-
-
-        
-
-        
 
     def create_help_menu(self):
         """
