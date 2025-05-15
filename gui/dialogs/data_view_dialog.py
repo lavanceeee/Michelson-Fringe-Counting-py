@@ -6,22 +6,23 @@ from core.log_manager import log_debug
 
 
 class DataViewDialog(QDialog):
-    def __init__(self, parent=None, center_brightness_save=None, time_save=None):
+    def __init__(self, parent=None, center_brightness_save=None, time_save=None, smoothed_data=None, n=0, threshold=0):
         super().__init__(parent)
 
         self.center_brightness_save = center_brightness_save
         self.time_data = time_save
+        self.smoothed_data = smoothed_data
+        self.result_N = n  # 直接使用传入的N值
+        self.threshold = threshold  # 直接使用传入的阈值
 
         self.setup_ui()
-
-        self.result_N = 0
-
-        self.threshold = 0
-
-        #为计算N单独开一个方法
-        self.calculate_N()
-
-         #加载图表数据
+        
+        # 更新UI显示N值
+        if self.result_N != 0:
+            self.result_N_value.setText(str(self.result_N))
+            log_debug(f"显示页面的N值为{self.result_N}")
+        
+        # 加载图表数据
         self.load_plot_data(self.center_brightness_save, self.time_data)
 
     def setup_ui(self):
@@ -63,7 +64,7 @@ class DataViewDialog(QDialog):
     def calculate_N(self):
         if self.center_brightness_save is not None:
             try:
-                self.result_N, self.threshold = FigureN.figureN(self.center_brightness_save)
+                self.result_N, self.threshold, _ = FigureN.figureN(self.center_brightness_save)
                 self.result_N_value.setText(str(self.result_N))
 
                 log_debug(f"显示页面的N值为{self.result_N}")
@@ -72,16 +73,25 @@ class DataViewDialog(QDialog):
 
     #可视化数据
     def load_plot_data(self, center_brightness_save, time_data):
-
-        # 绘制中心亮度数据
+        # 清空图表
         self.plot_widget.clear()
-        self.plot_widget.plot(time_data, center_brightness_save, pen=pg.mkPen('r', width=2), name='中心亮度')
         
-        # 添加平均亮度线
+        # 绘制原始数据(红色)
+        self.plot_widget.plot(time_data, center_brightness_save, 
+                              pen=pg.mkPen('r', width=2), name='原始亮度')
+        
+        # 绘制平滑后的数据(绿色)
+        if self.smoothed_data is not None:
+            self.plot_widget.plot(time_data, self.smoothed_data, 
+                                 pen=pg.mkPen('g', width=2), name='平滑后亮度')
+        
+        # 添加阈值线
         if self.threshold is not None:
-            self.plot_widget.addLine(y=self.threshold, pen=pg.mkPen('b', width=2, style=Qt.PenStyle.DashLine), name='平均亮度')
+            self.plot_widget.addLine(y=self.threshold, 
+                                   pen=pg.mkPen('b', width=2, style=Qt.PenStyle.DashLine), 
+                                   name='阈值')
         
-        # 设置坐标轴标签
+        # 设置图表标签
         self.plot_widget.setLabel('left', '亮度')
         self.plot_widget.setLabel('bottom', '帧')
         self.plot_widget.addLegend()

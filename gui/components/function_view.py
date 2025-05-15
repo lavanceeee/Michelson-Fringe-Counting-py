@@ -183,7 +183,6 @@ class FunctionView(QWidget):
             self.start_detection_button.setText("开始数条纹")
 
             self.is_detecting = False
-            log_debug(f"is_detecting: {self.is_detecting}")
 
             log_warning("手动停止数条纹进程")
 

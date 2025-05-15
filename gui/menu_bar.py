@@ -3,10 +3,11 @@ from PyQt6.QtWidgets import (QMenuBar, QMenu, QToolBar,
 from PyQt6.QtGui import QAction  
 from PyQt6.QtWidgets import QDialog
 from gui.dialogs.camera_config_dialog import CameraConfigDialog
-from core.log_manager import log_info, log_error
+from core.log_manager import log_info, log_error, log_debug
 from gui.dialogs.data_view_dialog import DataViewDialog
 from core.log_manager import log_info
 from core.service.video_counter import VideoCounter
+from algorithm.figure_N import FigureN
 
 class MenuBarManger:
     def __init__(self, main_window):
@@ -112,18 +113,28 @@ class MenuBarManger:
         return data_menu
     
     def show_data_view(self):
-
-        #拿主窗口的FigureView
+        # 获取数据源
+        main_window_counts_detector = self.main_window.counts_detector
         main_window_figure_view = self.main_window.figure_view
         
-        #FigureView的数据
-        center_brightness_save = main_window_figure_view.center_brightness_save.copy()
+        # 获取原始数据
+        center_brightness_save = main_window_counts_detector.center_pos_array.copy()
         time_data = main_window_figure_view.time_save.copy()
 
-        #创建显示窗口并接受数据
-        data_view_dialog = DataViewDialog(parent=self.main_window, 
-                                        center_brightness_save=center_brightness_save, 
-                                        time_save=time_data)
+        log_debug(f"----一共拿到的center点的个数是{len(center_brightness_save)}----")
+
+        # 计算平滑后的数据
+        n, threshold, smoothed_data = FigureN.figureN(center_brightness_save)
+
+        # 创建新的对话框实例并传入所有数据
+        data_view_dialog = DataViewDialog(
+            parent=self.main_window, 
+            center_brightness_save=center_brightness_save, 
+            time_save=time_data,
+            smoothed_data=smoothed_data,
+            n=n,
+            threshold=threshold
+        )
         data_view_dialog.show()
 
     def create_help_menu(self):

@@ -2,7 +2,6 @@ from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout
 import pyqtgraph as pg
-from core.log_manager import log_info
 
 """
 亮度检测可视化区域
@@ -74,10 +73,6 @@ class FigureView(QWidget):
         self.plot_widget.addItem(avg_line)
 
     def update_point_data(self, brightness, time):
-
-        log_info("----进入组件更新点数据----")
-        log_info(f"当前中心亮度: {brightness}")
-        log_info(f"当前时间: {time}")
 
         self.center_brightness_save.append(brightness)
         self.time_save.append(time)

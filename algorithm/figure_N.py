@@ -16,21 +16,33 @@ class FigureN:
         smoothed_data = ndimage.gaussian_filter1d(brightness_array, sigma=5)
         
         # 计算平滑后数据的平均值作为阈值
-        threshold = np.mean(smoothed_data)
+        threshold = round(np.mean(smoothed_data), 2)
+
+        log_debug(f"计算处的阈值是{threshold}")
         
         # 计数穿越
         crossings = 0
+        counts = 0
         above_threshold = smoothed_data[0] > threshold
         
         for i in range(1, len(smoothed_data)):
+
+            log_debug(f"当前点{smoothed_data[i]},第{i}个")
+
             current_above = smoothed_data[i] > threshold
+
+            log_debug(f"当前值为{current_above}")
+
             if current_above != above_threshold:
+                counts+=1
+                log_debug(f"---改变了！！counts为{counts}---")
+
                 crossings += 1
                 above_threshold = current_above
                 
         N = int(crossings / 2)
         log_debug(f"计算出来的N是{N}")
-        return N, threshold
+        return N, threshold, smoothed_data
         
 
 

@@ -43,10 +43,13 @@ class CountsDetector(QObject): #继承QObject支持信号槽
 
         if len(frame.shape) == 2:  # 灰度图
             brightness = frame[self.center_pos[1], self.center_pos[0]]
+            log_debug("是灰度图")
+
         else:  # 多通道图像
             # 获取所有通道的值并计算亮度
             pixel_values = frame[self.center_pos[1], self.center_pos[0]]
             brightness = np.mean(pixel_values)
+            log_debug("是多通道图")
 
         #转换为小数并保留两位
         brightness = round(float(brightness), 2)

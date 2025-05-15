@@ -46,22 +46,22 @@ class MyWindow(QMainWindow):
         self.detection_timer = QTimer(self)
         self.detection_timer.timeout.connect(self.detect_circles) # 定时器触发时调用检测方法
 
-        #创建亮度检测定时器
+        # 创建亮度检测定时器
         self.brightness_timer = QTimer(self)
-        self.brightness_timer.setInterval(100)
+        self.brightness_timer.setInterval(2)
         self.brightness_timer.timeout.connect(self.update_brightness_detection)
 
-        self.detection_start_time = None # 仅用于标记检测是否开启
-        self.current_processed_frame = None # 存储当前处理后的帧 (可能不再需要，取决于预处理是否只在CNN内部做)
-        self.last_original_cv_frame = None # <--- 新增：存储原始 OpenCV 帧
+        self.detection_start_time = None
+        self.current_processed_frame = None
+        self.last_original_cv_frame = None
         # 添加一个变量来存储最后显示的未标记图像
         self.last_unmarked_pixmap = None
-        self.is_displaying_marked_image = False # 标记当前是否显示的是带标记的图
+        self.is_displaying_marked_image = False
         self.orignal_qimage = None
 
     def setup_ui(self):
         self.setWindowTitle("Kama")
-        # 重新调整窗口大小以适应新布局，宽度可以小一些
+
         self.setGeometry(50, 50, 600, 600)
 
         self.menu_manager = MenuBarManger(self)
@@ -453,9 +453,10 @@ class MyWindow(QMainWindow):
             self.counts_detector.start_cout(center_list)
             self.brightness_timer.start()
 
+            self.update_brightness_detection()
+
             log_debug(f"在主函数的即将传递的坐标是：{center_list[0]} and {center_list[1]}---")
         else:
-
             self.counts_detector.start_signal = False
             #清空第一帧
             self.counts_detector.first_frame = None
@@ -487,9 +488,7 @@ class MyWindow(QMainWindow):
         每1000ms触发一次的亮度检测
         直接发送原始QImage
         """
-
         if self.counts_detector.start_signal:
-
             self.counts_detector.update_frame(self.orignal_qimage)
             
 if __name__ == "__main__":

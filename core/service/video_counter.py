@@ -169,9 +169,9 @@ class VideoCounter:
 
         from algorithm.figure_N import FigureN
 
-        n, _ = FigureN.figureN(center_brightness_list)
+        n, threshold = FigureN.figureN(center_brightness_list)
 
-        log_info(f"手动导入视频，计算的N为{n}")
+        log_info(f"手动导入视频，计算的N为{n},阈值为{threshold}")
 
         cap.release()
 
