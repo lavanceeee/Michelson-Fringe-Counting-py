@@ -46,9 +46,6 @@ class VideoCounter:
         self.main_window = main_window
         self.video_path = None
         self.current_pos = [0,0]
-        #标记不是灰度视频
-        self.is_gray_video = False
-        self.data_average_brightness = 0
 
     def show_video_select(self):
 
@@ -60,10 +57,9 @@ class VideoCounter:
                                   directory="",
                                   filter=video_fileter)
         if not video_file_path:
-            log_warning("用户取消了视频选择")
+            log_warning("已取消视频选择")
             return
         else:
-            log_info(f"视频路径为{video_file_path}")
             alert_success("视频选择成功，请在接下来的窗口上使用鼠标标定圆心坐标")
 
             self.video_path = video_file_path
@@ -88,8 +84,6 @@ class VideoCounter:
         #图片的大小
         frame_width = gray_frame.shape[1]
         frame_height = gray_frame.shape[0]
-
-        log_info(f"视频第一帧的宽度为{frame_width},高度为{frame_height}")
 
         #创建弹窗窗口
         first_frame_dialog = QDialog(self.main_window)
@@ -122,7 +116,6 @@ class VideoCounter:
         # 鼠标点击事件
         self.image_label.mousePressEvent = self.mouse_click_event
 
-        
         first_frame_dialog.exec()
 
     def mouse_click_event(self, event):
@@ -155,6 +148,7 @@ class VideoCounter:
     def handle_result(self, n, threshold):
         try:
             alert_success(f"计算完成！N值为{n}，阈值为{threshold}")
+
         except Exception as e:
             import traceback
             log_error(f"handle_result 内部出错: {e}\n{traceback.format_exc()}")

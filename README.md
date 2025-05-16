@@ -67,5 +67,3 @@ kama/
 - 项目主页：[https://github.com/Lizhongpeng2/Kama](https://github.com/Lizhongpeng2/Kama)
 
 ---
-
-© 2025 Kama开发团队 

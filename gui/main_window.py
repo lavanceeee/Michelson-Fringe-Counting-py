@@ -33,7 +33,7 @@ class MyWindow(QMainWindow):
         # 使用绝对路径
         model_path = r"D:\SoftwareEngining\workAndHue\compatation\physics\write\pythonFileNewVer\models\model_weights\best_model.pth"
 
-        log_info(f"从绝对路径 {model_path} 加载模型...")
+        log_info("正在加载CNN模型...")
 
         if load_inference_model(model_path):
              log_info("CNN 模型加载成功。")
@@ -80,7 +80,7 @@ class MyWindow(QMainWindow):
         top_container.setObjectName("topContainer")  # 设置对象名
         top_container.setFrameShape(QFrame.Shape.StyledPanel)
         top_container.setStyleSheet("""
-            #topContainer {  /* 使用ID选择器，只选择特定对象 */
+            #topContainer {  
                 border: 1px solid red;
                 border-radius: 5px;
             }
@@ -150,7 +150,7 @@ class MyWindow(QMainWindow):
         # 添加对摄像头连接状态的处理
         self.camera_controller.connection_lost.connect(self.handle_camera_disconnected)
 
-    def update_frame(self, image): # 输入可能是 QImage 或 None
+    def update_frame(self, image):
         # 1. 首先处理 None 的情况
         if image is None:
             self.camera_display.clear()
@@ -161,13 +161,12 @@ class MyWindow(QMainWindow):
             self.last_original_cv_frame = None # 确保重置
             return # 如果 image 是 None，停止处理
 
-        # 2. 如果接收到的是 QImage (根据错误推断这是主要情况)
         if isinstance(image, QImage):
             try:
                 # A. 直接使用接收到的 QImage 创建用于显示的 Pixmap
                 pixmap = QPixmap.fromImage(image) 
 
-                self.last_unmarked_pixmap = pixmap # 存储用于显示的 pixmap
+                self.last_unmarked_pixmap = pixmap
                 self.function_view.current_frame(pixmap)
                 
                 # B. 将 QImage 转换为 OpenCV 格式 (NumPy 数组) 以便后续处理
@@ -350,7 +349,6 @@ class MyWindow(QMainWindow):
                 log_warning("No original frame available for detection.")
                 return # 没有帧就直接返回
 
-            # 检查检测是否应该运行 (以防万一在定时器触发和执行之间被停止)
             if self.detection_start_time is None:
                 log_debug("Scheduled detection skipped: Detection was stopped.")
                 # 确保定时器也停止了

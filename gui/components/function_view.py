@@ -13,11 +13,10 @@ class FunctionView(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        #创建manual_calibration_dialog实例
         self.manual_calibration_dialog = ManualCalibrationDialog(self)
 
         self.setup_ui()
-        
+
         self.is_detecting = False
         self.is_brightness_detecting = False #开始数条纹
         self._current_frame = None
@@ -63,7 +62,7 @@ class FunctionView(QWidget):
         self.start_button.setFont(font)
 
         # 创建警告标签
-        self.warning_label = QLabel("请先传入干涉图像")
+        self.warning_label = QLabel("请先连接摄像头")
         self.warning_label.setObjectName("warningLabel")  # 设置对象名，便于应用样式
 
         # 添加控件到水平布局
@@ -83,9 +82,10 @@ class FunctionView(QWidget):
 
         #数据导出按钮
         self.data_analyse_label = QLabel("本次统计已结束，可以查看详细数据并导出")
+        #允许换行
+        self.data_analyse_label.setWordWrap(True)
         self.data_analyse_label.setObjectName("data_analyse_label")
         
-
         #初始时不可见
         self.data_analyse_label.setVisible(False)
 
@@ -125,17 +125,14 @@ class FunctionView(QWidget):
 
     #自动检测被点击
     def on_start_button_clicked(self):
-        #处理点击事件
-        #发送检测信号
-        #.emit() 发送信号，触发信号的连接函数
 
         self.is_detecting = not self.is_detecting
         if self.is_detecting:
             self.start_button.setText("停止识别")
-            log_info("开始自动识别圆环")
+            log_info("即将开始自动识别圆环")
         else:
             self.start_button.setText("开启识别")
-            log_warning("手动停止自动识别")
+            log_info("已经手动停止自动识别")
 
         self.detect_circles_signal.emit(self.is_detecting)
 
@@ -145,44 +142,37 @@ class FunctionView(QWidget):
         
     #手动检测点击函数
     def on_manual_button_clicked(self):
-
-        self.is_detecting = not self.is_detecting
         
-        try:
+        if self._current_frame:
 
-            if self.is_detecting and self._current_frame:
-
-                #设置当前帧
-                self.manual_calibration_dialog.set_frame(self._current_frame)
+            #设置当前帧
+            self.manual_calibration_dialog.set_frame(self._current_frame)
                 
-                self.manual_calibration_dialog.show()
+            self.manual_calibration_dialog.show()
 
-                if self.manual_calibration_dialog.exec() == QDialog.DialogCode.Accepted:
-                    self.current_center = self.manual_calibration_dialog.xy_position
+            if self.manual_calibration_dialog.exec() == QDialog.DialogCode.Accepted:
+                self.current_center = self.manual_calibration_dialog.xy_position
 
-                    log_debug(f"用户标定数据{self.current_center}成功存储到function_view")
+                log_debug(f"用户标定数据{self.current_center}成功存储到function_view")
 
-                    self.start_detection_button.setEnabled(True)
+                self.start_detection_button.setEnabled(True)
             else:
-                log_info("退出手动定位圆心模式")
+                log_info("用户手动关闭了手动标定窗口")
+        else:
+            log_warning("请先传入干涉图像")
+            return
 
 
-        except Exception as e:
-            log_error(f"手动检测点击函数出错：{e}")
 
     def on_start_detection_button_clicked(self):
-        #属性查询
-        self.is_brightness_detecting = not getattr(self, 'is_brightness_detecting', False)
 
         if self.is_brightness_detecting:
             
-            self.start_detection_button.setText("停止数条纹")
+            self.start_detection_button.setText("停止计数")
 
-            log_info("开始数条纹进程")
+            log_info("即将开始数条纹进程...")
         else:
-            self.start_detection_button.setText("开始数条纹")
-
-            self.is_detecting = False
+            self.start_detection_button.setText("开始计数")
 
             log_warning("手动停止数条纹进程")
 
