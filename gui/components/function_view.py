@@ -1,5 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QDialog
 from PyQt6.QtCore import Qt, pyqtSignal
+from torchgen.executorch.api.et_cpp import return_names
+
+from core.alert_manager import alert_error
 from core.log_manager import log_warning, log_info, log_error, log_debug
 from gui.dialogs.manual_calibration_dialog import ManualCalibrationDialog
 
@@ -18,8 +21,9 @@ class FunctionView(QWidget):
         self.setup_ui()
 
         self.is_detecting = False
-        self.is_brightness_detecting = False #开始数条纹
+        self.is_brightness_detecting = False
         self._current_frame = None
+        self.is_connected = False
 
         #标定中心
         self.current_center = [0, 0]
@@ -151,41 +155,48 @@ class FunctionView(QWidget):
             self.manual_calibration_dialog.show()
 
             if self.manual_calibration_dialog.exec() == QDialog.DialogCode.Accepted:
+
                 self.current_center = self.manual_calibration_dialog.xy_position
 
                 log_debug(f"用户标定数据{self.current_center}成功存储到function_view")
 
                 self.start_detection_button.setEnabled(True)
+
             else:
                 log_info("用户手动关闭了手动标定窗口")
         else:
             log_warning("请先传入干涉图像")
             return
 
-
-
     def on_start_detection_button_clicked(self):
 
-        if self.is_brightness_detecting:
-            
-            self.start_detection_button.setText("停止计数")
+        if not self.is_connected:
+            log_error("您断开了摄像头的连接！请重连")
+            alert_error("出错！您已断开了摄像头的连接")
+            return
 
+        self.is_brightness_detecting = not self.is_brightness_detecting
+
+        if self.is_brightness_detecting:
+            self.start_detection_button.setText("停止计数")
             log_info("即将开始数条纹进程...")
         else:
             self.start_detection_button.setText("开始计数")
-
             log_warning("手动停止数条纹进程")
-
             self.data_analyse_label.setVisible(True)
+            #不再允许本次计数
+            self.start_detection_button.setEnabled(not self.is_brightness_detecting)
 
         #发送信号
         self.start_count_signal.emit(self.is_brightness_detecting, self.current_center)
 
+    #连接摄像头后重置按钮状态
     def set_camera_connected(self, is_connected):
-        """根据摄像头连接状态设置按钮状态和提示标签可见性"""
+        self.is_connected = is_connected
+
         self.start_button.setEnabled(is_connected)
         self.manual_button.setEnabled(is_connected)
-        self.warning_label.setVisible(not is_connected)  # 当摄像头连接时隐藏警告
+        self.warning_label.setVisible(not is_connected)  # 隐藏第一条警告
 
 
 
