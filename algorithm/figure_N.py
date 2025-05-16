@@ -18,8 +18,6 @@ class FigureN:
         # 计算平滑后数据的平均值作为阈值
         threshold = round(np.mean(smoothed_data), 2)
 
-        print(f"计算处的阈值是{threshold}")
-        
         # 计数穿越
         crossings = 0
         counts = 0
@@ -27,21 +25,18 @@ class FigureN:
         
         for i in range(1, len(smoothed_data)):
 
-            print(f"当前点{smoothed_data[i]},第{i}个")
-
             current_above = smoothed_data[i] > threshold
 
             print(f"当前值为{current_above}")
 
             if current_above != above_threshold:
                 counts+=1
-                print(f"---改变了！！counts为{counts}---")
 
                 crossings += 1
+
                 above_threshold = current_above
                 
         N = int(crossings / 2)
-        print(f"计算出来的N是{N}")
         return N, threshold, smoothed_data
         
 

@@ -6,10 +6,6 @@ from algorithm.circle_detector import CircleDetector
 from core.log_manager import log_info, log_warning, log_error, log_debug
 
 class CameraManager(QObject):
-    """
-    摄像头管理器 - 负责摄像头连接、图像处理和圆环检测
-    实现业务逻辑与UI分离，高内聚低耦合
-    """
     # 定义信号
     frame_ready = pyqtSignal(QImage)  # 图像准备好（原始或处理后）
     detection_status_changed = pyqtSignal(bool)  # 检测状态变化

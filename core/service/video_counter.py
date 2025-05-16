@@ -125,11 +125,7 @@ class VideoCounter:
         
         first_frame_dialog.exec()
 
-        log_debug("打开窗口成功")
-
     def mouse_click_event(self, event):
-        log_info(f"手动标定圆心坐标为{self.current_pos}")
-
         #关闭窗口
         self.image_label.parent().close()
 
@@ -146,24 +142,19 @@ class VideoCounter:
             # 创建处理线程
             self.process_thread = VideoProcessingThread(self.video_path, self.current_pos)
 
-        
             # 连接信号
             self.process_thread.result_signal.connect(self.handle_result, Qt.ConnectionType.QueuedConnection)
 
-            log_debug(f"信号定义: {self.process_thread.result_signal}")
-        
-            
             # 启动线程
             self.process_thread.start()
+
         except Exception as e:
             import traceback
             log_error(f"创建或启动线程出错: {e}\n{traceback.format_exc()}")
         
     def handle_result(self, n, threshold):
-        print(f"--- handle_result CALLED with n={n}, threshold={threshold} ---")
         try:
             alert_success(f"计算完成！N值为{n}，阈值为{threshold}")
-            # 处理逻辑...
         except Exception as e:
             import traceback
             log_error(f"handle_result 内部出错: {e}\n{traceback.format_exc()}")
