@@ -104,7 +104,7 @@ class MyWindow(QMainWindow):
         bottom_container.setObjectName("bottomContainer")  # 设置对象名
         bottom_container.setFrameShape(QFrame.Shape.StyledPanel)
         bottom_container.setStyleSheet("""
-            #bottomContainer {  /* 使用ID选择器，只选择特定对象 */
+            #bottomContainer {  
                 border: 1px solid red;
                 border-radius: 5px;
             }

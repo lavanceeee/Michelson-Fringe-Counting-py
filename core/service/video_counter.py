@@ -1,10 +1,11 @@
 from PyQt6.QtWidgets import QFileDialog, QDialog, QLabel, QVBoxLayout
 from PyQt6.QtGui import QImage, QPixmap, QPainter, QPen
 from PyQt6.QtCore import Qt, QPoint
-from core.log_manager import log_warning, log_info, log_debug
-from core.alert_manager import alert_error,alert_success
+from core.log_manager import log_warning, log_info, log_debug, log_error
+from core.alert_manager import alert_error, alert_success
 import cv2
 import numpy as np
+from thread.video_processing_thread import VideoProcessingThread
 
 
 class CustomLabel(QLabel):
@@ -132,52 +133,44 @@ class VideoCounter:
         #关闭窗口
         self.image_label.parent().close()
 
-        # 统计数据的方法
         self.data_count()
 
     # 鼠标移动事件
-    def on_mouse_move(self,event):
+    def on_mouse_move(self, event):
         self.current_pos = event.pos()
         self.image_label.updateCrosshair(event.pos())
 
     def data_count(self):
-        #重新读取视频
-        cap = cv2.VideoCapture(self.video_path)
 
-        #计算总帧率
-        #转成int类型
-        total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
-        log_info(f"总帧率为{total_frame}")
-
-        center_brightness_list = []
-
-        x,y = self.current_pos.x(), self.current_pos.y()
-
-        log_info(f"圆心坐标为{x},{y}")
-
-        for _ in range(1, total_frame):
-            ret, frame = cap.read()
-
-            if not ret:
-                return
-            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            if 0 <= y < gray_frame.shape[0] and 0 <= x < gray_frame.shape[1]:
-                brightness = gray_frame[y, x]
-                center_brightness_list.append(brightness)
-
-        from algorithm.figure_N import FigureN
-
-        n, threshold = FigureN.figureN(center_brightness_list)
-
-        log_info(f"手动导入视频，计算的N为{n},阈值为{threshold}")
-
-        cap.release()
-
-            
+        try:
+            # 创建处理线程
+            self.process_thread = VideoProcessingThread(self.video_path, self.current_pos)
 
         
+            # 连接信号
+            self.process_thread.result_signal.connect(self.handle_result, Qt.ConnectionType.QueuedConnection)
+
+            log_debug(f"信号定义: {self.process_thread.result_signal}")
+        
+            
+            # 启动线程
+            self.process_thread.start()
+        except Exception as e:
+            import traceback
+            log_error(f"创建或启动线程出错: {e}\n{traceback.format_exc()}")
+        
+    def handle_result(self, n, threshold):
+        print(f"--- handle_result CALLED with n={n}, threshold={threshold} ---")
+        try:
+            alert_success(f"计算完成！N值为{n}，阈值为{threshold}")
+            # 处理逻辑...
+        except Exception as e:
+            import traceback
+            log_error(f"handle_result 内部出错: {e}\n{traceback.format_exc()}")
+
+        
+
+                
 
 
 
