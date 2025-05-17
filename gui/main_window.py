@@ -53,6 +53,7 @@ class MyWindow(QMainWindow):
         self.last_unmarked_pixmap = None
         self.is_displaying_marked_image = False
         self.orignal_qimage = None
+        self.should_show_mark = False  # 是否需要显示十字标记
 
     def setup_ui(self):
         self.setWindowTitle("Kama")
@@ -125,6 +126,9 @@ class MyWindow(QMainWindow):
 
         # 当点击自动检测按钮时，调用toggle_detection
         self.function_view.detect_circles_signal.connect(self.toggle_detection)
+
+        #点击确定，标记圆心坐标
+        self.function_view.clicked_and_can_mark_signal.connect(self.mark_center)
 
         #连接开始数条纹的信号
         self.function_view.start_count_signal.connect(self.toggle_light_count)
@@ -225,23 +229,31 @@ class MyWindow(QMainWindow):
                 # 存储转换后的 OpenCV 帧 (NumPy 数组)
                 self.last_original_cv_frame = cv_frame_for_processing.copy() # 存储 NumPy 数组
 
-                # C. 更新显示 (仅在当前未显示标记图像时)
-
-                # ----- is_detecting的定义----
-                # ----- 如果没检测的话，这里是直接显示未标记的图像
-                is_detecting = self.detection_start_time is not None
-                if not is_detecting or not self.is_displaying_marked_image:
-                    self.camera_display.setPixmap(self.last_unmarked_pixmap) # 使用存储的 pixmap
-
-                    #标定一次当前帧的圆心
-                    self.mark_center(self.last_unmarked_pixmap)
-
-                if self.counts_detector.start_signal:
+                #计数信号
+                if self.counts_detector.start_update_frame:
                     self.counts_detector.update_frame(self.orignal_qimage)
 
-                # D. 更新连接状态
-                #使得自动检测按钮可以点击
+                #所有按钮可以点击
                 self.function_view.set_camera_connected(True)
+
+                # 在显示图像之前检查是否需要绘制十字
+                if self.should_show_mark and self.last_unmarked_pixmap:
+                    display_pixmap = self.last_unmarked_pixmap.copy()
+                    painter = QPainter(display_pixmap)
+                    pen = QPen(QColor(255, 0, 0))  # 红色
+                    pen.setWidth(3)  # 加粗使其更明显
+                    painter.setPen(pen)
+                    
+                    # 绘制十字
+                    x, y = self.current_position[0], self.current_position[1]
+                    painter.drawLine(x - 10, y, x + 10, y)
+                    painter.drawLine(x, y - 10, x, y + 10)
+                    painter.end()
+                    
+                    # 显示带标记的图像
+                    self.camera_display.setPixmap(display_pixmap)
+                else:
+                    self.camera_display.setPixmap(self.last_unmarked_pixmap)
 
             except Exception as e:
                  log_error(f"在 update_frame 中处理/转换 QImage 时出错: {e}")
@@ -277,10 +289,6 @@ class MyWindow(QMainWindow):
         # CircleDetector.last_position = None
         self.last_unmarked_pixmap = None
         self.is_displaying_marked_image = False # 重置标记
-
-    def show_about(self):
-        """显示关于对话框"""
-        log_info("打开关于对话框")
 
     def toggle_detection(self, start):
         if start:
@@ -435,43 +443,19 @@ class MyWindow(QMainWindow):
              log_debug("恢复显示被跳过 (可能检测已停止或状态已改变)")
 
 
-    def toggle_light_count(self, is_start, center_list):
+    def toggle_light_count(self, is_start):
         if is_start:
 
-            #中心坐标
-            self.current_position = center_list
-
-            self.counts_detector.start_cout(center_list)
-
-            log_debug(f"在主函数的即将传递的坐标是：{center_list[0]} and {center_list[1]}---")
+            self.counts_detector.start_cout(self.current_position)
         else:
-            self.counts_detector.start_signal = False
-            #清空第一帧
-            self.counts_detector.first_frame = None
-            #清空当前帧
-            self.counts_detector.current_frame = None
+            self.counts_detector.start_update_frame = False
             #清空中心点
             self.counts_detector.center_pos = [0,0]
-            #清空时间
-            self.counts_detector.update_time = 0
-
-    def mark_center(self, marked_frame):
-        # 标定一次当前帧的圆心
-        painter = QPainter(marked_frame)
-
-        pen = QPen(QColor(255, 0, 0))  # 红色
-        pen.setWidth(2)  # 设置边框宽度
-        painter.setPen(pen)
-
-        painter.drawLine(self.current_position[0] - 10, self.current_position[1], self.current_position[0] + 10, self.current_position[1])
-        painter.drawLine(self.current_position[0], self.current_position[1] - 10, self.current_position[0], self.current_position[1] + 10)
-
-        painter.end()
-        self.camera_display.setPixmap(marked_frame)
-
-
-        
             
+    def mark_center(self, can_mark, center_list):
+        self.current_position = center_list
+        self.should_show_mark = can_mark
+      
 if __name__ == "__main__":
     app = QApplication([])
     main_window = MyWindow()

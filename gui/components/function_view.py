@@ -11,7 +11,10 @@ class FunctionView(QWidget):
     detect_circles_signal = pyqtSignal(bool)
 
     #开始数条纹的信号
-    start_count_signal = pyqtSignal(bool, list)
+    start_count_signal = pyqtSignal(bool)
+
+    #可以标记的信号
+    clicked_and_can_mark_signal = pyqtSignal(bool, list)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -79,12 +82,11 @@ class FunctionView(QWidget):
         self.manual_button.setFixedSize(80, 30)
         self.manual_button.setFont(font)
 
-        # 开启检测按钮
+        # 3.开启检测按钮
         self.start_detection_button = QPushButton("开启检测")
         self.start_detection_button.setFixedSize(80, 30)
         self.start_detection_button.setFont(font)
 
-        #数据导出按钮
         self.data_analyse_label = QLabel("本次统计已结束，可以查看详细数据并导出")
         #允许换行
         self.data_analyse_label.setWordWrap(True)
@@ -93,10 +95,16 @@ class FunctionView(QWidget):
         #初始时不可见
         self.data_analyse_label.setVisible(False)
 
+        # 4. 数据清除按钮
+        self.data_clear_button = QPushButton("数据清理")
+        self.data_clear_button.setFixedSize(80, 30)
+        self.data_clear_button.setFont(font)
+
         # 初始状态禁用按钮
         self.start_button.setEnabled(False)
         self.manual_button.setEnabled(False)
         self.start_detection_button.setEnabled(False)
+        self.data_clear_button.setEnabled(False)
 
         # 鼠标悬浮效果复用
         hover_style = """
@@ -112,12 +120,14 @@ class FunctionView(QWidget):
         self.start_button.setStyleSheet(hover_style)
         self.manual_button.setStyleSheet(hover_style)
         self.start_detection_button.setStyleSheet(hover_style)
+        self.data_clear_button.setStyleSheet(hover_style)
 
         # 将水平布局添加到主布局
         main_layout.addLayout(first_line_layout)
         main_layout.addWidget(self.manual_button)
         main_layout.addWidget(self.start_detection_button)
         main_layout.addWidget(self.data_analyse_label)
+        main_layout.addWidget(self.data_clear_button)
 
         # 设置布局
         self.setLayout(main_layout)
@@ -126,6 +136,7 @@ class FunctionView(QWidget):
         self.start_button.clicked.connect(self.on_start_button_clicked)
         self.manual_button.clicked.connect(self.on_manual_button_clicked)
         self.start_detection_button.clicked.connect(self.on_start_detection_button_clicked)
+        self.data_clear_button.clicked.connect(self.on_data_clear_button_clicked)
 
     #自动检测被点击
     def on_start_button_clicked(self):
@@ -158,7 +169,10 @@ class FunctionView(QWidget):
 
                 self.current_center = self.manual_calibration_dialog.xy_position
 
-                log_debug(f"用户标定数据{self.current_center}成功存储到function_view")
+                #发送可以标记信号
+                self.clicked_and_can_mark_signal.emit(True, self.current_center)
+
+                log_debug(f"用户已标定{self.current_center}为圆心")
 
                 self.start_detection_button.setEnabled(True)
 
@@ -184,16 +198,16 @@ class FunctionView(QWidget):
             self.start_detection_button.setText("开始计数")
             log_warning("手动停止数条纹进程")
             self.data_analyse_label.setVisible(True)
-            #不再允许本次计数
-            self.start_detection_button.setEnabled(not self.is_brightness_detecting)
+            self.clicked_and_can_mark_signal.emit(False, [])
+            #可以清理数据
+            self.data_clear_button.setEnabled(True)
 
         #发送信号
-        self.start_count_signal.emit(self.is_brightness_detecting, self.current_center)
+        self.start_count_signal.emit(self.is_brightness_detecting)
 
     #连接摄像头后重置按钮状态
     def set_camera_connected(self, is_connected):
         self.is_connected = is_connected
-
         self.start_button.setEnabled(is_connected)
         self.manual_button.setEnabled(is_connected)
         self.warning_label.setVisible(not is_connected)  # 隐藏第一条警告

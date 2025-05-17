@@ -14,23 +14,21 @@ class CountsDetector(QObject): #继承QObject支持信号槽
 
         self.center_pos = [0,0]
 
-        self.current_frame = None
-
-        self.start_signal = False
-
         self.center_pos_array = []
 
+        self.start_update_frame = False
+
+
     def start_cout(self, center_list):
-        #开始检测
-        self.start_signal = True
 
         self.center_pos = center_list
+
+        #发送开始信号
+        self.start_update_frame = True
 
     #更新帧率
     #frame 为QImage
     def update_frame(self, qimage_frame):
-        self.current_frame = qimage_frame
-
         #转换为numpy数组
         frame = ImageConverter.image2numpyArray(qimage_frame)
 

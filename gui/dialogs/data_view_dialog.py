@@ -39,11 +39,8 @@ class DataViewDialog(QDialog):
         #1.2 右侧的数据展示区域
         self.result_data_layout = QVBoxLayout()
 
-        self.result_N_label = QLabel("N值：")
-
         self.result_N_value = QLabel(f"N值：{self.result_N}")
 
-        self.result_data_layout.addWidget(self.result_N_label)
         self.result_data_layout.addWidget(self.result_N_value)
 
         self.result_data_layout.addStretch()
