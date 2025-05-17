@@ -122,7 +122,7 @@ class MenuBarManger:
         main_window_counts_detector = self.main_window.counts_detector
         
         # 获取原始数据
-        center_brightness_save = main_window_counts_detector.center_pos_array.copy()
+        center_brightness_save = main_window_counts_detector.center_pos_array
 
         #如果数据为0那么直接结束
         if len(center_brightness_save) == 0:

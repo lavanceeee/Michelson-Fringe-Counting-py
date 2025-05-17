@@ -138,6 +138,9 @@ class MyWindow(QMainWindow):
         
         self.counts_detector.center_brightness_signal.connect(self.figure_view.update_point_data)
 
+        #清理数据
+        self.function_view.data_clear_signal.connect(self.clear_history_data)
+
     def setup_camera(self):
         self.camera_controller = CameraController()
 
@@ -240,8 +243,8 @@ class MyWindow(QMainWindow):
                 if self.should_show_mark and self.last_unmarked_pixmap:
                     display_pixmap = self.last_unmarked_pixmap.copy()
                     painter = QPainter(display_pixmap)
-                    pen = QPen(QColor(255, 0, 0))  # 红色
-                    pen.setWidth(3)  # 加粗使其更明显
+                    pen = QPen(QColor(255, 0, 0))
+                    pen.setWidth(2)
                     painter.setPen(pen)
                     
                     # 绘制十字
@@ -455,7 +458,17 @@ class MyWindow(QMainWindow):
     def mark_center(self, can_mark, center_list):
         self.current_position = center_list
         self.should_show_mark = can_mark
-      
+
+    def clear_history_data(self):
+        self.current_position = []
+        
+        #清空图表
+        self.figure_view.clear_data()
+
+        #清理counts_detector
+        self.counts_detector.center_pos = []
+        self.counts_detector.center_pos_array = []
+
 if __name__ == "__main__":
     app = QApplication([])
     main_window = MyWindow()

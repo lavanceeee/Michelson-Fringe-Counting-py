@@ -1,8 +1,8 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QDialog
+from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QDialog, QMessageBox
 from PyQt6.QtCore import Qt, pyqtSignal
 from torchgen.executorch.api.et_cpp import return_names
 
-from core.alert_manager import alert_error
+from core.alert_manager import alert_error, alert_warning
 from core.log_manager import log_warning, log_info, log_error, log_debug
 from gui.dialogs.manual_calibration_dialog import ManualCalibrationDialog
 
@@ -15,6 +15,9 @@ class FunctionView(QWidget):
 
     #可以标记的信号
     clicked_and_can_mark_signal = pyqtSignal(bool, list)
+
+    #数据清理信号
+    data_clear_signal = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -29,7 +32,7 @@ class FunctionView(QWidget):
         self.is_connected = False
 
         #标定中心
-        self.current_center = [0, 0]
+        self.current_center = []
 
     def setup_ui(self):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -211,6 +214,27 @@ class FunctionView(QWidget):
         self.start_button.setEnabled(is_connected)
         self.manual_button.setEnabled(is_connected)
         self.warning_label.setVisible(not is_connected)  # 隐藏第一条警告
+
+    #数据清理按钮被点击
+    def on_data_clear_button_clicked(self):
+
+        state = alert_warning("确保您已保存数据！", self, "确认清理")
+
+        if state == QMessageBox.StandardButton.Ok:
+
+            self.data_clear_button.setEnabled(False)
+
+            self.data_analyse_label.setVisible(False)
+
+            self.current_center = []
+
+            self.data_clear_signal.emit()
+        else:
+            return
+
+
+
+
 
 
 

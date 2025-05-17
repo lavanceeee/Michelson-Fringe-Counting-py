@@ -12,7 +12,7 @@ class CountsDetector(QObject): #继承QObject支持信号槽
 
         super().__init__(parent)
 
-        self.center_pos = [0,0]
+        self.center_pos = []
 
         self.center_pos_array = []
 
