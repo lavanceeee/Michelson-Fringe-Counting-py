@@ -5,10 +5,8 @@ from utils.image2numpyArray import ImageConverter
 
 class CountsDetector(QObject): #继承QObject支持信号槽
 
-    #平均亮度信号
-    average_brightness_signal = pyqtSignal(float)
     #每次更新的中心亮度
-    center_brightness_signal = pyqtSignal(float, float)
+    center_brightness_signal = pyqtSignal(float)
 
     def __init__(self, parent=None):
 
@@ -20,12 +18,7 @@ class CountsDetector(QObject): #继承QObject支持信号槽
 
         self.start_signal = False
 
-        self.average_brightness = 0
-
         self.center_pos_array = []
-
-        #临时的更新时间
-        self.update_time = 0
 
     def start_cout(self, center_list):
         #开始检测
@@ -53,11 +46,9 @@ class CountsDetector(QObject): #继承QObject支持信号槽
         brightness = round(float(brightness), 2)
 
         self.center_pos_array.append(brightness)
-
-        self.update_time += 1
         
         # 实时发送数组坐标并渲染
-        self.center_brightness_signal.emit(brightness, self.update_time)
+        self.center_brightness_signal.emit(brightness)
 
 
 

@@ -172,7 +172,7 @@ class FunctionView(QWidget):
 
         if not self.is_connected:
             log_error("您断开了摄像头的连接！请重连")
-            alert_error("出错！您已断开了摄像头的连接")
+            alert_error("您已断开了摄像头的连接")
             return
 
         self.is_brightness_detecting = not self.is_brightness_detecting

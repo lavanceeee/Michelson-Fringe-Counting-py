@@ -20,7 +20,6 @@ class FigureN:
 
         # 计数穿越
         crossings = 0
-        counts = 0
         above_threshold = smoothed_data[0] > threshold
         
         for i in range(1, len(smoothed_data)):
@@ -28,7 +27,6 @@ class FigureN:
             current_above = smoothed_data[i] > threshold
 
             if current_above != above_threshold:
-                counts+=1
 
                 crossings += 1
 

@@ -6,7 +6,7 @@ from core.alert_manager import alert_error, alert_success
 import cv2
 import numpy as np
 from thread.video_processing_thread import VideoProcessingThread
-
+from gui.elements.loading_ele import LoadingDialog
 
 class CustomLabel(QLabel):
     def __init__(self, parent=None):
@@ -46,6 +46,7 @@ class VideoCounter:
         self.main_window = main_window
         self.video_path = None
         self.current_pos = [0,0]
+        self.loading_dialog = LoadingDialog(self.main_window)
 
     def show_video_select(self):
 
@@ -136,7 +137,7 @@ class VideoCounter:
             self.process_thread = VideoProcessingThread(self.video_path, self.current_pos)
 
             #开始信号，用于加载动画
-            self.process_thread.start_thread_signal.connect(self.show_loading_animation)
+            self.process_thread.started_thread_signal.connect(self.show_loading_animation)
 
             # 处理结果信号
             self.process_thread.result_signal.connect(self.handle_result, Qt.ConnectionType.QueuedConnection)
@@ -159,23 +160,10 @@ class VideoCounter:
 
     def show_loading_animation(self, is_loading):
         if is_loading:
-            if not hasattr(self, 'loading_dialog'):
-                self.loading_dialog = QDialog(self.main_window)
-
-                layout = QVBoxLayout()
-
-                processing_bar = QProgressBar()
-                #不确定模式，循环
-                processing_bar.setRange(0, 0)
-
-                layout.addWidget(QLabel("正在计算,请稍后..."))
-                layout.addWidget(processing_bar)
-
-                self.loading_dialog.setLayout(layout)
-            self.loading_dialog.show()
+            self.loading_dialog.show() 
         else:
-            if hasattr(self, 'loading_dialog') and self.loading_dialog:
-                self.loading_dialog.close() 
+            self.loading_dialog.hide()
+
 
 
 

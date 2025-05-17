@@ -2,12 +2,14 @@ from PyQt6.QtWidgets import (QMenuBar, QMenu, QToolBar,
                              QFileDialog)
 from PyQt6.QtGui import QAction  
 from PyQt6.QtWidgets import QDialog
+from core.alert_manager import alert_error
 from gui.dialogs.camera_config_dialog import CameraConfigDialog
 from core.log_manager import log_info, log_error, log_debug
 from gui.dialogs.data_view_dialog import DataViewDialog
 from core.log_manager import log_info
 from core.service.video_counter import VideoCounter
-from algorithm.figure_N import FigureN
+from thread.figure_n_thread import FigureNThread
+from gui.elements.loading_ele import LoadingDialog
 
 class MenuBarManger:
     def __init__(self, main_window):
@@ -20,6 +22,9 @@ class MenuBarManger:
         self.menubar = main_window.menuBar()
         # 调用设置菜单的方法
         self.setup_menus()
+
+        #初始化加载动画
+        self.loading_dialog = LoadingDialog(self.main_window)
 
     def setup_menus(self):
         """
@@ -115,27 +120,38 @@ class MenuBarManger:
     def show_data_view(self):
         # 获取数据源
         main_window_counts_detector = self.main_window.counts_detector
-        main_window_figure_view = self.main_window.figure_view
         
         # 获取原始数据
         center_brightness_save = main_window_counts_detector.center_pos_array.copy()
-        time_data = main_window_figure_view.time_save.copy()
 
-        log_debug(f"----一共拿到的center点的个数是{len(center_brightness_save)}----")
+        #如果数据为0那么直接结束
+        if len(center_brightness_save) == 0:
+            log_error("您还未开启检测")
+            alert_error("您还未开启检测")
+            return
 
-        # 计算平滑后的数据
-        n, threshold, smoothed_data = FigureN.figureN(center_brightness_save)
+        #创建计算线程
+        self.figure_n_thread = FigureNThread(center_brightness_save)
+        self.figure_n_thread.finished_data_signal.connect(self.handle_finished_data)
+        self.figure_n_thread.is_running.connect(self.show_animation)
+        self.figure_n_thread.start()
 
+    def show_animation(self, is_running):
+        if is_running:
+            self.loading_dialog.show()
+        else:
+            self.loading_dialog.hide()
+            
+    def handle_finished_data(self, n, threshold, smoothed_data):
         # 创建新的对话框实例并传入所有数据
         data_view_dialog = DataViewDialog(
-            parent=self.main_window, 
-            center_brightness_save=center_brightness_save, 
-            time_save=time_data,
+            parent=self.main_window,  
             smoothed_data=smoothed_data,
             n=n,
             threshold=threshold
         )
         data_view_dialog.show()
+        
 
     def create_help_menu(self):
         """

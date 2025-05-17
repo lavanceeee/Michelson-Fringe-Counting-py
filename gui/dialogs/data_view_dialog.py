@@ -1,29 +1,23 @@
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout,QLabel
 from PyQt6.QtCore import Qt
 import pyqtgraph as pg
-from algorithm.figure_N import FigureN
 from core.log_manager import log_debug
 
 
 class DataViewDialog(QDialog):
-    def __init__(self, parent=None, center_brightness_save=None, time_save=None, smoothed_data=None, n=0, threshold=0):
+    def __init__(self, parent=None,smoothed_data=None, n=0, threshold=0):
         super().__init__(parent)
 
-        self.center_brightness_save = center_brightness_save
-        self.time_data = time_save
         self.smoothed_data = smoothed_data
-        self.result_N = n  # 直接使用传入的N值
-        self.threshold = threshold  # 直接使用传入的阈值
+        self.result_N = n  
+        self.threshold = threshold 
 
         self.setup_ui()
-        
-        # 更新UI显示N值
-        if self.result_N != 0:
-            self.result_N_value.setText(str(self.result_N))
-            log_debug(f"显示页面的N值为{self.result_N}")
+
+        self.time_data = [i for i in range(len(self.smoothed_data))]
         
         # 加载图表数据
-        self.load_plot_data(self.center_brightness_save, self.time_data)
+        self.load_plot_data()
 
     def setup_ui(self):
         self.setWindowTitle("数据查看")
@@ -47,7 +41,7 @@ class DataViewDialog(QDialog):
 
         self.result_N_label = QLabel("N值：")
 
-        self.result_N_value = QLabel("N/A")
+        self.result_N_value = QLabel(f"N值：{self.result_N}")
 
         self.result_data_layout.addWidget(self.result_N_label)
         self.result_data_layout.addWidget(self.result_N_value)
@@ -60,30 +54,15 @@ class DataViewDialog(QDialog):
         
         self.setLayout(main_layout)
 
-
-    def calculate_N(self):
-        if self.center_brightness_save is not None:
-            try:
-                self.result_N, self.threshold, _ = FigureN.figureN(self.center_brightness_save)
-                self.result_N_value.setText(str(self.result_N))
-
-                log_debug(f"显示页面的N值为{self.result_N}")
-            except Exception as e:
-                log_debug(f"计算N值时发生错误: {e}")
-
+            
     #可视化数据
-    def load_plot_data(self, center_brightness_save, time_data):
+    def load_plot_data(self):
         # 清空图表
         self.plot_widget.clear()
         
-        # 绘制原始数据(红色)
-        self.plot_widget.plot(time_data, center_brightness_save, 
-                              pen=pg.mkPen('r', width=2), name='原始亮度')
-        
-        # 绘制平滑后的数据(绿色)
         if self.smoothed_data is not None:
-            self.plot_widget.plot(time_data, self.smoothed_data, 
-                                 pen=pg.mkPen('g', width=2), name='平滑后亮度')
+            self.plot_widget.plot(self.time_data, self.smoothed_data, 
+                                 pen=pg.mkPen('r', width=2), name='平滑后亮度')
         
         # 添加阈值线
         if self.threshold is not None:

@@ -42,14 +42,9 @@ class MyWindow(QMainWindow):
 
         self.current_position = [0, 0]
 
-        # 创建检测定时器
+        # 自动检测定时器
         self.detection_timer = QTimer(self)
         self.detection_timer.timeout.connect(self.detect_circles) # 定时器触发时调用检测方法
-
-        # 创建亮度检测定时器
-        self.brightness_timer = QTimer(self)
-        self.brightness_timer.setInterval(2)
-        self.brightness_timer.timeout.connect(self.update_brightness_detection)
 
         self.detection_start_time = None
         self.current_processed_frame = None
@@ -137,9 +132,7 @@ class MyWindow(QMainWindow):
         # 创建CountsDetector实例
         self.counts_detector = CountsDetector()
         
-        # 一次性连接信号
         self.counts_detector.center_brightness_signal.connect(self.figure_view.update_point_data)
-        self.counts_detector.average_brightness_signal.connect(self.figure_view.init_average_brightness_data)
 
     def setup_camera(self):
         self.camera_controller = CameraController()
@@ -242,6 +235,9 @@ class MyWindow(QMainWindow):
 
                     #标定一次当前帧的圆心
                     self.mark_center(self.last_unmarked_pixmap)
+
+                if self.counts_detector.start_signal:
+                    self.counts_detector.update_frame(self.orignal_qimage)
 
                 # D. 更新连接状态
                 #使得自动检测按钮可以点击
@@ -446,9 +442,6 @@ class MyWindow(QMainWindow):
             self.current_position = center_list
 
             self.counts_detector.start_cout(center_list)
-            self.brightness_timer.start()
-
-            self.update_brightness_detection()
 
             log_debug(f"在主函数的即将传递的坐标是：{center_list[0]} and {center_list[1]}---")
         else:
@@ -461,8 +454,6 @@ class MyWindow(QMainWindow):
             self.counts_detector.center_pos = [0,0]
             #清空时间
             self.counts_detector.update_time = 0
-            #结束定时器
-            self.brightness_timer.stop()
 
     def mark_center(self, marked_frame):
         # 标定一次当前帧的圆心
@@ -478,13 +469,8 @@ class MyWindow(QMainWindow):
         painter.end()
         self.camera_display.setPixmap(marked_frame)
 
-    def update_brightness_detection(self):
-        """
-        每1000ms触发一次的亮度检测
-        直接发送原始QImage
-        """
-        if self.counts_detector.start_signal:
-            self.counts_detector.update_frame(self.orignal_qimage)
+
+        
             
 if __name__ == "__main__":
     app = QApplication([])

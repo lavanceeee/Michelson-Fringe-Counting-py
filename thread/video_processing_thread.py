@@ -1,9 +1,8 @@
 from PyQt6.QtCore import QThread, pyqtSignal
 import cv2
 from algorithm.figure_N import FigureN
-import time
+from thread.figure_n_thread import FigureNThread
 class VideoProcessingThread(QThread):
-    # 定义信号
 
     result_signal = pyqtSignal(int)  # N值
     started_thread_signal = pyqtSignal(bool)
@@ -39,14 +38,11 @@ class VideoProcessingThread(QThread):
                     brightness = gray_frame[y, x]
                     center_brightness_list.append(brightness)
 
-            n, _, _ = FigureN.figureN(center_brightness_list)
+            #引入计算点数线程
+            self.figure_n_thread = FigureNThread(center_brightness_list)
+            self.figure_n_thread.finished_data_signal.connect(self.handle_finished_data)
+            self.figure_n_thread.start()
 
-            time.sleep(5)
-            self.started_thread_signal.emit(False)
-
-            # 发送结果信号
-            self.result_signal.emit(n)
-            
         except Exception as e:
             import traceback
             print(f"线程执行出错: {e}\n{traceback.format_exc()}")
@@ -54,4 +50,10 @@ class VideoProcessingThread(QThread):
         finally:
             if cap is not None and cap.isOpened(): 
                 cap.release()
+
+    def handle_finished_data(self, n, threshold, smoothed_data):
+        self.started_thread_signal.emit(False)
+        self.result_signal.emit(n)
+        
+        
 
