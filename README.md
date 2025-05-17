@@ -54,16 +54,4 @@ kama/
 └── index.bat         # 快速启动脚本
 ```
 
-## 注意事项
-
-- 首次运行前请确保摄像头设备正确连接
-- 为获得最佳检测效果，建议使用分辨率不低于720p的摄像头
-- 图像分析结果仅供参考，实际精度受多种因素影响
-
-## 联系方式
-
-如有问题或建议，请通过以下方式联系开发团队：
-- 电子邮件：[lizhongpeng2@gmail.com](mailto:lizhongpeng2@gmail.com)
-- 项目主页：[https://github.com/Lizhongpeng2/Kama](https://github.com/Lizhongpeng2/Kama)
-
 ---

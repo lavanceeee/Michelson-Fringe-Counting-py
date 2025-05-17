@@ -27,8 +27,6 @@ class FigureN:
 
             current_above = smoothed_data[i] > threshold
 
-            print(f"当前值为{current_above}")
-
             if current_above != above_threshold:
                 counts+=1
 

@@ -4,7 +4,6 @@ from core.log_manager import log_info, log_debug, log_error
 from utils.image_pre_processing import preprocess_for_circle_detection
 import numpy as np
 
-#全局变量：加载模型 设备
 inference_model = None 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -32,7 +31,6 @@ def load_inference_model(model_weight_path):
     global inference_model
 
     try:
-        log_info(f"正在从{model_weight_path}加载模型权重")
 
         inference_model = CircleCenterNet(pretrained=False) #pretrained=False 表示加载自己的权重
 

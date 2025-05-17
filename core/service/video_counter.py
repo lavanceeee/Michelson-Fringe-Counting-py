@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QFileDialog, QDialog, QLabel, QVBoxLayout
+from PyQt6.QtWidgets import QFileDialog, QDialog, QLabel, QVBoxLayout, QProgressBar
 from PyQt6.QtGui import QImage, QPixmap, QPainter, QPen
 from PyQt6.QtCore import Qt, QPoint
 from core.log_manager import log_warning, log_info, log_debug, log_error
@@ -60,7 +60,7 @@ class VideoCounter:
             log_warning("已取消视频选择")
             return
         else:
-            alert_success("视频选择成功，请在接下来的窗口上使用鼠标标定圆心坐标")
+            alert_success("视频选择成功，点击确定后请标定圆心坐标")
 
             self.video_path = video_file_path
             
@@ -135,7 +135,10 @@ class VideoCounter:
             # 创建处理线程
             self.process_thread = VideoProcessingThread(self.video_path, self.current_pos)
 
-            # 连接信号
+            #开始信号，用于加载动画
+            self.process_thread.start_thread_signal.connect(self.show_loading_animation)
+
+            # 处理结果信号
             self.process_thread.result_signal.connect(self.handle_result, Qt.ConnectionType.QueuedConnection)
 
             # 启动线程
@@ -145,13 +148,36 @@ class VideoCounter:
             import traceback
             log_error(f"创建或启动线程出错: {e}\n{traceback.format_exc()}")
         
-    def handle_result(self, n, threshold):
+    def handle_result(self, n):
         try:
-            alert_success(f"计算完成！N值为{n}，阈值为{threshold}")
+            log_info(f"计算已完成，N值为{n}")
+            alert_success(f"计算已完成，N值为{n}")
 
         except Exception as e:
             import traceback
             log_error(f"handle_result 内部出错: {e}\n{traceback.format_exc()}")
+
+    def show_loading_animation(self, is_loading):
+        if is_loading:
+            if not hasattr(self, 'loading_dialog'):
+                self.loading_dialog = QDialog(self.main_window)
+
+                layout = QVBoxLayout()
+
+                processing_bar = QProgressBar()
+                #不确定模式，循环
+                processing_bar.setRange(0, 0)
+
+                layout.addWidget(QLabel("正在计算,请稍后..."))
+                layout.addWidget(processing_bar)
+
+                self.loading_dialog.setLayout(layout)
+            self.loading_dialog.show()
+        else:
+            if hasattr(self, 'loading_dialog') and self.loading_dialog:
+                self.loading_dialog.close() 
+
+
 
         
 

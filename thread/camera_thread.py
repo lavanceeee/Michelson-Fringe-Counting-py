@@ -16,7 +16,6 @@ class CameraThread(QThread):
         self.camera = None
     
     def set_camera_url(self, url):
-        """设置摄像头URL"""
         self.camera_url = url
         
     def run(self):

@@ -30,7 +30,7 @@ class MyWindow(QMainWindow):
         # 初始化摄像头
         self.setup_camera()
 
-        # 使用绝对路径
+        # 绝对路径
         model_path = r"D:\SoftwareEngining\workAndHue\compatation\physics\write\pythonFileNewVer\models\model_weights\best_model.pth"
 
         log_info("正在加载CNN模型...")
@@ -122,8 +122,8 @@ class MyWindow(QMainWindow):
 
         # 添加日志管理器
         log_manager.set_console_view(self.console_view)
-        log_info("Console initialized.")
-        log_warning("Please connect the camera device first.")
+        log_info("调试窗口初始化完成")
+        log_warning("请先连接摄像头设备")
 
         # 将包含边框的底部容器添加到主布局
         self.main_layout.addWidget(bottom_container)
@@ -231,9 +231,6 @@ class MyWindow(QMainWindow):
 
                 # 存储转换后的 OpenCV 帧 (NumPy 数组)
                 self.last_original_cv_frame = cv_frame_for_processing.copy() # 存储 NumPy 数组
-
-                # if self.counts_detector.start_signal:
-                #     self.counts_detector.update_frame(self.last_original_cv_frame)
 
                 # C. 更新显示 (仅在当前未显示标记图像时)
 

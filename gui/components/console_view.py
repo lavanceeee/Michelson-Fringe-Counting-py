@@ -22,15 +22,10 @@ class ConsoleView(QWidget):
         # 创建标题标签
         self.title_label = QLabel("Terminal")
 
-        # # 创建分隔线
-        # self.separator_line = QFrame()
-        # self.separator_line.setFrameShape(QFrame.Shape.HLine)  # 设置为水平线
-        # self.separator_line.setFrameShadow(QFrame.Shadow.Sunken) # 使用默认的阴影效果来显示线条
-
         #创建日志文本区域
         self.log_text = QTextEdit()
-        self.log_text.setReadOnly(True) #将文本区域设置为只读
-        self.log_text.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap) #设置不自动换行
+        self.log_text.setReadOnly(True) #只读
+        self.log_text.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth) #自动换行
         self.log_text.setStyleSheet("""
             QTextEdit {
                 background-color: #f8f8f8;
