@@ -3,6 +3,7 @@ import numpy as np
 from core.log_manager import log_info, log_error, log_debug, log_warning
 import time
 
+#新的圆心检测
 class CircleDetector:
     @staticmethod
     def process_opencv_frame(frame):
