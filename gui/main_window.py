@@ -8,7 +8,6 @@ from gui.components.figure_view import FigureView
 from gui.menu_bar import MenuBarManger
 from gui.components.camera_view import CameraDisplay
 from core.camera_controller import CameraController
-from gui.dialogs.camera_config_dialog import CameraConfigDialog
 from gui.components.function_view import FunctionView
 from gui.components.console_view import ConsoleView
 from core.log_manager import log_manager, log_info, log_warning, log_error, log_debug
@@ -30,17 +29,9 @@ class MyWindow(QMainWindow):
         # 初始化摄像头
         self.setup_camera()
 
-        # 绝对路径
-        model_path = r"D:\SoftwareEngining\workAndHue\compatation\physics\write\pythonFileNewVer\models\model_weights\best_model.pth"
-
-        log_info("正在加载CNN模型...")
-
-        if load_inference_model(model_path):
-             log_info("CNN 模型加载成功。")
-        else:
-             log_error("CNN 模型加载失败，检测功能将不可用")
-
         self.current_position = [0, 0]
+
+
 
         # 自动检测定时器
         self.detection_timer = QTimer(self)
@@ -297,19 +288,24 @@ class MyWindow(QMainWindow):
         if start:
             # 检查摄像头是否已连接
             if self.camera_controller is None or not self.camera_controller.is_connected:
-                 log_warning("Cannot start detection: Camera not connected.")
-                 # 重置按钮状态 (如果 FunctionView 支持)
-                 # self.function_view.reset_button_state() 
+                 log_warning("摄像头未连接！")
                  return
 
             # 开始检测
-            log_debug("toggle_detection被调用，开始检测")
-            log_info("开始检测 - 定时 (5s间隔), 短暂显示结果")
             self.detection_start_time = QDateTime.currentMSecsSinceEpoch() # 标记检测已开始
-            
-            # 检查是否有图像可以立即检测一次
-            # (修改为检查是否有原始帧)
-            if self.last_original_cv_frame is not None: # <--- 修改：检查原始帧
+
+            #初始化CNN连接
+            # 绝对路径
+            model_path = r"D:\SoftwareEngining\workAndHue\compatation\physics\write\pythonFileNewVer\models\model_weights\best_model.pth"
+
+            log_info("正在加载CNN模型...")
+
+            if load_inference_model(model_path):
+                log_info("CNN 模型加载成功。")
+            else:
+                log_error("CNN 模型加载失败，检测功能将不可用")
+
+            if self.last_original_cv_frame is not None:
                  log_debug("立即检测一次...")
                  self.detect_circles() # 立即执行一次检测并更新显示
             else:
@@ -319,16 +315,14 @@ class MyWindow(QMainWindow):
             log_debug("启动检测定时器 (2s间隔).")
             self.detection_timer.start(2000)
         else:
-            # 停止检测
-            log_debug("toggle_detection的else部分被调用，停止检测")
-            log_warning("Detection stopped by user.")
-            self.detection_start_time = None # 标记检测已停止
+            log_warning("检测已暂停")
+            self.detection_start_time = None
             # 停止定时器
             if self.detection_timer.isActive():
                 self.detection_timer.stop() 
                 log_debug("Detection timer stopped.")
             
-            # *** 停止后，恢复显示最后一次收到的未标记图像 ***
+            #停止后，恢复显示最后一次收到的未标记图像
             if self.last_unmarked_pixmap:
                  self.camera_display.setPixmap(self.last_unmarked_pixmap)
                  log_debug("已停止检测，恢复显示最后一次收到的未标记图像.")
@@ -343,13 +337,8 @@ class MyWindow(QMainWindow):
             self.is_displaying_marked_image = False # 重置标记
 
     def detect_circles(self):
-        # 这个方法现在只由定时器调用
         try:
-            # 检查处理后的灰度图是否可用 (修改为检查原始帧)
-            # if not hasattr(self, 'current_processed_frame') or self.current_processed_frame is None:
-            #     log_warning("No processed frame available for scheduled detection")
-            #     return
-            if self.last_original_cv_frame is None: # <--- 修改：检查原始帧
+            if self.last_original_cv_frame is None:
                 log_warning("No original frame available for detection.")
                 return # 没有帧就直接返回
 
@@ -362,15 +351,11 @@ class MyWindow(QMainWindow):
 
             log_debug("detect_circles被调用")
 
-            # 调用灰度图检测方法 (修改为调用处理原始帧的方法)
-            # processed_frame, circle_count = CircleDetector.process_preprocessed_frame(
-            #     self.current_processed_frame
-            # )
             log_debug("开始调用基于CNN的圆环检测方法...")
             # 调用基于 CNN 的处理方法，传入原始帧
             marked_frame, circle_count = CircleDetector.process_opencv_frame(
                 self.last_original_cv_frame
-            ) # <--- 修改：调用新方法并传入原始帧
+            )
             
             # 转换为QImage显示
             try:
