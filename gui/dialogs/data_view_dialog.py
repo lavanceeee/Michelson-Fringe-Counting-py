@@ -1,7 +1,6 @@
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout,QLabel,QFrame,QPushButton,QFileDialog
 from PyQt6.QtCore import Qt
 import pyqtgraph as pg
-from core.log_manager import log_debug
 from gui.elements.select_dialog import SelectDialog
 from thread.data_export_thread import DataExportThread
 from datetime import datetime
@@ -165,6 +164,7 @@ class DataViewDialog(QDialog):
         file_name = f"result_data_N={self.result_N}_{timestamp}.{file_type}"
         save_path, _ = QFileDialog.getSaveFileName(self, "保存文件", file_name, f"{file_type}文件 (*.{file_type})")
         return save_path
+
 
 
 
