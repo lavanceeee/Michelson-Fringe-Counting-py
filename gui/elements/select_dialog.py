@@ -26,6 +26,13 @@ class SelectDialog(QDialog):
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
 
+        #重新设置文字
+        self.button_box.button(QDialogButtonBox.StandardButton.Ok).setText("导出")
+        self.button_box.button(QDialogButtonBox.StandardButton.Cancel).setText("取消")
+
+        #禁用ok按钮
+        self.button_box.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+
         self.button_box.accepted.connect(self.emit_selected_data_type)
         self.button_box.rejected.connect(self.reject)
         self.layout.addWidget(self.button_box)
@@ -43,6 +50,8 @@ class SelectDialog(QDialog):
                 selected_types.append(cb.text())
         self.send_data_type_signal.emit(selected_types)
         self.accept()
+
+
 
 
 

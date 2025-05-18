@@ -92,7 +92,7 @@ class DataViewDialog(QDialog):
         self.bottom_function_frame = QFrame()
         
         #底部功能区
-        self.bottom_function_frame.setFixedSize(600, 90)
+        self.bottom_function_frame.setFixedSize(610, 90)
         self.bottom_function_frame.setObjectName("bottom_function_frame") #类名
         bottom_function_layout = QHBoxLayout(self.bottom_function_frame)
 
