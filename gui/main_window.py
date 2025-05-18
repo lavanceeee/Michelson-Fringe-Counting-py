@@ -1,6 +1,7 @@
 import sys
 import cv2
 import numpy as np
+from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout, QFrame
 from PyQt6.QtCore import Qt, QTimer, QDateTime
 from PyQt6.QtGui import QPixmap, QImage, QPainter, QPen, QColor
@@ -453,6 +454,21 @@ class MyWindow(QMainWindow):
         #清理counts_detector
         self.counts_detector.center_pos = []
         self.counts_detector.center_pos_array = []
+
+    #重写closeEvent方法
+    def closeEvent(self, event):
+        replay = QMessageBox.question(
+            self,
+            "退出确认",
+            "确定退出程序吗？未保存数据将丢失。",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        ) 
+
+        if replay == QMessageBox.StandardButton.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
 
 if __name__ == "__main__":
     app = QApplication([])
