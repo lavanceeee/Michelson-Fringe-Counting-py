@@ -87,19 +87,14 @@ class MenuBarManger:
         return camera_config
 
     def show_camera_config(self):
-        """
-        显示摄像头配置对话框
-        """
+        #摄像头配置
+
         dialog = CameraConfigDialog(self.main_window)
         if dialog.exec() == QDialog.DialogCode.Accepted.value:
             # 获取配置的IP和端口
             ip, port = dialog.get_camera_config()
 
-            # 尝试连接摄像头
-            if self.main_window.camera_controller.connect_camera(ip, port):
-                log_info("connect camera success")
-            else:
-                log_error("connect camera failed")
+            self.main_window.camera_controller.connect_camera(ip, port)
 
     def create_data_menu(self):
         data_menu = QMenu('数据处理', self.menubar)
@@ -152,7 +147,6 @@ class MenuBarManger:
         )
         data_view_dialog.show()
         
-
     def create_help_menu(self):
         """
         创建帮助菜单及其子项

@@ -62,6 +62,9 @@ class FigureView(QWidget):
 
         self.center_curve.setData(self.x_values, self.center_brightness_save)
 
+        #设置x轴范围
+        self.plot_widget.setXRange(0, self.x_values[-1])
+
     def clear_data(self):
         self.center_brightness_save = []
         self.x_values = []

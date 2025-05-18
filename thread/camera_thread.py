@@ -19,10 +19,9 @@ class CameraThread(QThread):
         self.camera_url = url
         
     def run(self):
-        """线程主函数，循环读取摄像头"""
         try:
             self.camera = cv2.VideoCapture(self.camera_url)
-            if not self.camera.isOpened():
+            if not self.camera.isOpened(): 
                 self.connection_lost.emit()
                 return
                 
@@ -32,33 +31,21 @@ class CameraThread(QThread):
                 if not ret:
                     self.connection_lost.emit()
                     break
-                    
-                # # 处理图像并发送信号
-                # # 原始图像转为QImage
-                # h, w, ch = frame.shape
-                # bytes_per_line = ch * w
-                # qt_image = QImage(frame.data, w, h, bytes_per_line, QImage.Format.Format_BGR888).copy()
-                # self.frame_ready.emit(qt_image)
                 
                 blurred = preprocess_for_circle_detection(frame)
                 if blurred is not None:
                     h, w = blurred.shape
                     processed_qt_image = QImage(blurred.data, w, h, w*1, QImage.Format.Format_Grayscale8)
-                    # self.processed_frame_ready.emit(blurred)
 
                     self.frame_ready.emit(processed_qt_image)
                 
-                # # 控制帧率
-                # self.msleep(30)  # 约33fps
-                
-        except Exception as e:
+        except Exception:
             self.connection_lost.emit()
         finally:
             if self.camera:
                 self.camera.release()
     
     def stop(self):
-        """停止线程"""
         self.running = False
         self.wait()  # 等待线程结束
     

@@ -147,11 +147,10 @@ class MyWindow(QMainWindow):
         if image is None:
             self.camera_display.clear()
             self.camera_display.setText("等待摄像头...")
-            log_warning("在 update_frame: 接收到 None.")
             self.function_view.set_camera_connected(False)
             self.last_unmarked_pixmap = None
-            self.last_original_cv_frame = None # 确保重置
-            return # 如果 image 是 None，停止处理
+            self.last_original_cv_frame = None 
+            return 
 
         if isinstance(image, QImage):
             try:
@@ -463,12 +462,13 @@ class MyWindow(QMainWindow):
             "确定退出程序吗？未保存数据将丢失。",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         ) 
-
         if replay == QMessageBox.StandardButton.Yes:
+            #检查并关闭摄像头连接
+            if self.camera_controller and self.camera_controller.is_connected:
+                self.camera_controller.disconnect()
             event.accept()
         else:
             event.ignore()
-
 
 if __name__ == "__main__":
     app = QApplication([])

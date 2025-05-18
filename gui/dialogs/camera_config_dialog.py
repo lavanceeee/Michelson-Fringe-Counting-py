@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout,
                             QLabel, QLineEdit, QPushButton)
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QDialogButtonBox
+from core.log_manager import log_error
 
 class CameraConfigDialog(QDialog): 
     """
@@ -105,7 +106,7 @@ class CameraConfigDialog(QDialog):
             self.saved_port = devicePort
             self.accept() #关闭对话框并返回接受状态
         else:
-            print("输入有空，请检查")
+            log_error("输入有空，请检查")
 
     def get_camera_config(self):
         #返回IP和端口号
