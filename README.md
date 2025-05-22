@@ -1,25 +1,26 @@
-# Kama 
-## Project Info
+# Kama
 
-Kama is a stupid image analysis system designed for physics experiments, primarily used for real-time capture, processing, and analysis of camera images. It supports ring detection and brightness variation measurement, making it suitable for Michelson interference fringe detection.
+## Project Overview
 
-## main function
+**Kama** is an image analysis system designed for physics experiments. It enables real-time capture, processing, and analysis of camera images, supporting functionalities such as ring detection and brightness variation measurement. The system is particularly suitable for Michelson interference fringe detection.
 
-[x] Real-time image acquisition from camera
+## Features
 
-### CNN-based ring center detection (in progress; polar coordinate-based methods under consideration)
+- **Real-time Image Acquisition**: Captures live images from the camera for experimental observation.
+- **Ring Center Detection**: Detects interference ring centers using a CNN-based model *(in progress; potential transition to polar coordinate and intensity centroiding under evaluation)*.
+- **Brightness Analysis**: Measures and records brightness changes at specific regions in real time.
+- **Data Visualization**: Displays brightness trends through intuitive graphical charts.
+- **Interactive Interface**: Provides a basic GUI for user interaction.
 
-### Brightness analysis at specified image regions
+## Tech Stack
 
-### Visualization of brightness variation trends
-
-### Basic interactive user interface
-
-## Teach Stack
-
-- **language**：Python
-- **Processing Stack**：OpenCV
-- **Framework**：PyTorch
-- **GUI**：PyQt6
+- **Programming Language**: Python
+- **Image Processing**: OpenCV
+- **Deep Learning Framework**: PyTorch
+- **GUI Framework**: PyQt6
 
 ---
+
+## Status
+
+The system is currently in early development. Some features are functional, while others (e.g., CNN-based detection) are under active development.
