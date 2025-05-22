@@ -1,19 +1,19 @@
 # Kama 
-## 项目概述
+## Project Info
 
 Kama is a stupid image analysis system designed for physics experiments, primarily used for real-time capture, processing, and analysis of camera images. It supports ring detection and brightness variation measurement, making it suitable for Michelson interference fringe detection.
 
-## 主要功能
+## main function
 
 [x] Real-time image acquisition from camera
 
-[ ] CNN-based ring center detection (in progress; polar coordinate-based methods under consideration)
+### CNN-based ring center detection (in progress; polar coordinate-based methods under consideration)
 
-[x] Brightness analysis at specified image regions
+### Brightness analysis at specified image regions
 
-[x] Visualization of brightness variation trends
+### Visualization of brightness variation trends
 
-[x] Basic interactive user interface
+### Basic interactive user interface
 
 ## Teach Stack
 
