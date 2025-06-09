@@ -1,26 +1,26 @@
-# Kama 
-## 项目概述
+# Kama
 
-Kama是一个为物理实验设计的图像分析系统，主要用于实时捕获、处理和分析摄像头图像，支持圆环检测和亮度变化测量，适用于迈克尔逊干涉圆环检测。
-## 主要功能
+## Project Overview
 
-- **实时图像采集**：通过摄像头捕获实验现象的实时图像(初步)
-- **圆环检测**：基于CNN模型的圆环中心检测(未完成，后期会转到极坐标和强度质心？待验证)
-- **亮度分析**：实时测量和记录图像特定位置的亮度变化(初步)
-- **数据可视化**：直观图表展示亮度变化趋势(初步)
-- **交互式界面**：基本功能已实现
+**Kama** is an image analysis system designed for physics experiments. It enables real-time capture, processing, and analysis of camera images, supporting functionalities such as ring detection and brightness variation measurement. The system is particularly suitable for Michelson interference fringe detection.
 
-## 技术栈
+## Features
 
-- **编程语言**：Python
-- **图像处理**：OpenCV
-- **深度学习**：基于PyTorch的CNN模型
-- **GUI框架**：PyQt6
+- **Real-time Image Acquisition**: Captures live images from the camera for experimental observation.
+- **Ring Center Detection**: Detects interference ring centers using a CNN-based model *(in progress; potential transition to polar coordinate and intensity centroiding under evaluation)*.
+- **Brightness Analysis**: Measures and records brightness changes at specific regions in real time.
+- **Data Visualization**: Displays brightness trends through intuitive graphical charts.
+- **Interactive Interface**: Provides a basic GUI for user interaction.
 
-## 开发环境
+## Tech Stack
 
-- **操作系统**：Win11
-- **Python版本**：3.11
-- **依赖包**：PyQt6, OpenCV, NumPy, PyTorch, matplotlib, pyqtgraph
+- **Programming Language**: Python
+- **Image Processing**: OpenCV
+- **Deep Learning Framework**: PyTorch
+- **GUI Framework**: PyQt6
 
 ---
+
+## Status
+
+The system is currently in early development. Some features are functional, while others (e.g., CNN-based detection) are under active development.
