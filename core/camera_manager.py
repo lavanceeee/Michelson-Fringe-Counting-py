@@ -26,10 +26,8 @@ class CameraManager(QObject):
         """连接摄像头"""
         success = self.camera_controller.connect_camera(ip, port)
         if success:
-            log_info("摄像头连接成功")
             self.camera_connection_changed.emit(True)
         else:
-            log_error("摄像头连接失败")
             self.camera_connection_changed.emit(False)
         return success
     

@@ -65,7 +65,7 @@ class FunctionView(QWidget):
         first_line_layout.setSpacing(10)  # 设置按钮和文字之间的间距
         
         # 创建按钮
-        self.start_button = QPushButton("自动识别")
+        self.start_button = QPushButton("CNN识别")
         self.start_button.setFixedSize(80, 30)
         font = self.start_button.font()
         font.setPointSize(10)
@@ -79,6 +79,11 @@ class FunctionView(QWidget):
         first_line_layout.addWidget(self.start_button)
         first_line_layout.addWidget(self.warning_label)
         first_line_layout.addStretch()  # 添加弹性空间，使按钮和文字靠左对齐
+
+        #传统算法识别
+        self.traditional_button = QPushButton("传统识别")
+        self.traditional_button.setFixedSize(80, 30)
+        self.traditional_button.setFont(font)
 
         # 2. 手动识别按钮
         self.manual_button = QPushButton("手动识别")
@@ -105,6 +110,7 @@ class FunctionView(QWidget):
 
         # 初始状态禁用按钮
         self.start_button.setEnabled(False)
+        self.traditional_button.setEnabled(False)
         self.manual_button.setEnabled(False)
         self.start_detection_button.setEnabled(False)
         self.data_clear_button.setEnabled(False)
@@ -121,12 +127,14 @@ class FunctionView(QWidget):
         """
 
         self.start_button.setStyleSheet(hover_style)
+        self.traditional_button.setStyleSheet(hover_style)
         self.manual_button.setStyleSheet(hover_style)
         self.start_detection_button.setStyleSheet(hover_style)
         self.data_clear_button.setStyleSheet(hover_style)
 
         # 将水平布局添加到主布局
         main_layout.addLayout(first_line_layout)
+        main_layout.addWidget(self.traditional_button)
         main_layout.addWidget(self.manual_button)
         main_layout.addWidget(self.start_detection_button)
         main_layout.addWidget(self.data_analyse_label)

@@ -8,11 +8,9 @@ class FigureN:
 
     @staticmethod
     def figureN(center_brightness_save):
-        # 将数据转换为numpy数组以便处理
         brightness_array = np.array(center_brightness_save)
         
-        # 应用高斯平滑，类似MATLAB的smoothdata
-        # sigma=10对应MATLAB中的窗口大小
+        # 高斯平滑
         smoothed_data = ndimage.gaussian_filter1d(brightness_array, sigma=5)
         
         # 计算平滑后数据的平均值作为阈值
