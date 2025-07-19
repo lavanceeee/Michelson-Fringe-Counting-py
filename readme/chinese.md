@@ -15,23 +15,24 @@ Kama是一款专为<u>迈克尔逊干涉条纹计数</u>设计的跨平台桌面
 
 它能够进行**实时捕捉**、**处理**和**数据分析**。
 
-<div style="float: left; width: 48%; margin-right: 2%;">
-  <img src="./pictures/main_page.png" alt="主页面" style="width: 100%;">
-</div>
-<div style="float: left; width: 48%;">
-  <img src="./pictures/center_mark.png" alt="中心标记" style="width: 100%;">
-</div>
-
-<div style="clear: both;"></div>
-
-<div style="float: left; width: 48%; margin-right: 2%; margin-top: 10px;">
-  <img src="./pictures/counting.png" alt="计数" style="width: 100%;">
-</div>
-<div style="float: left; width: 48%; margin-top: 10px;">
-  <img src="./pictures/data_processing.png" alt="数据处理" style="width: 100%;">
-</div>
-
-<div style="clear: both;"></div>
+<table>
+  <tr>
+    <td width="50%">
+      <img src="./pictures/main_page.png" alt="主页面" width="100%">
+    </td>
+    <td width="50%">
+      <img src="./pictures/center_mark.png" alt="中心标记" width="100%">
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="./pictures/counting.png" alt="计数" width="100%">
+    </td>
+    <td width="50%">
+      <img src="./pictures/data_processing.png" alt="数据处理" width="100%">
+    </td>
+  </tr>
+</table>
 
 ## 项目亮点
 

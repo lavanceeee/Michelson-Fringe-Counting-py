@@ -15,23 +15,24 @@ Kama is an cross-platform desktop fostwear designed for <u>Michelson fringe coun
 
 It enables **real-time capture**, **processing** and **data analyse**.
 
-<div style="float: left; width: 48%; margin-right: 2%;">
-  <img src="./readme/pictures/main_page.png" alt="main_page" style="width: 100%;">
-</div>
-<div style="float: left; width: 48%;">
-  <img src="./readme/pictures/center_mark.png" alt="center_mark" style="width: 100%;">
-</div>
-
-<div style="clear: both;"></div>
-
-<div style="float: left; width: 48%; margin-right: 2%; margin-top: 10px;">
-  <img src="./readme/pictures/counting.png" alt="counting" style="width: 100%;">
-</div>
-<div style="float: left; width: 48%; margin-top: 10px;">
-  <img src="./readme/pictures/data_processing.png" alt="data_processing" style="width: 100%;">
-</div>
-
-<div style="clear: both;"></div>
+<table>
+  <tr>
+    <td width="50%">
+      <img src="./readme/pictures/main_page.png" alt="main_page" width="100%">
+    </td>
+    <td width="50%">
+      <img src="./readme/pictures/center_mark.png" alt="center_mark" width="100%">
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="./readme/pictures/counting.png" alt="counting" width="100%">
+    </td>
+    <td width="50%">
+      <img src="./readme/pictures/data_processing.png" alt="data_processing" width="100%">
+    </td>
+  </tr>
+</table>
 
 ## Highlights
 
