@@ -3,7 +3,7 @@ import numpy as np
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QHBoxLayout, QFrame
 from PyQt6.QtCore import Qt, QTimer, QDateTime
-from PyQt6.QtGui import QPixmap, QImage, QPainter, QPen, QColor
+from PyQt6.QtGui import QPixmap, QImage, QPainter, QPen, QColor, QIcon
 from gui.components.figure_view import FigureView
 from gui.menu_bar import MenuBarManger
 from gui.components.camera_view import CameraDisplay
@@ -440,6 +440,7 @@ class MyWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication([])
+    app.setWindowIcon(QIcon("kama.svg"))
     main_window = MyWindow()
     main_window.show()
     app.exec()

@@ -1,12 +1,51 @@
 # Kama
 
+<div align="left">
+  <a href="./readme/chinese.md">
+    <img src="https://img.shields.io/badge/language-中文-blue.svg" alt="Switch to Chinese">
+  </a>
+  <a href="https://kama.2jone.top/" target="_blank">
+    <img src="https://img.shields.io/badge/Official_Website-kama.2jone.top-green.svg" alt="Official Website">
+  </a>
+</div>
+
 ## Overview
 
 Kama is an cross-platform desktop fostwear designed for <u>Michelson fringe counting</u>. 
 
 It enables **real-time capture**, **processing** and **data analyse**.
 
-Click [here](https://kama.2jone.top/) to get details about this softwear :)
+<div style="float: left; width: 48%; margin-right: 2%;">
+  <img src="./readme/pictures/main_page.png" alt="main_page" style="width: 100%;">
+</div>
+<div style="float: left; width: 48%;">
+  <img src="./readme/pictures/center_mark.png" alt="center_mark" style="width: 100%;">
+</div>
+
+<div style="clear: both;"></div>
+
+<div style="float: left; width: 48%; margin-right: 2%; margin-top: 10px;">
+  <img src="./readme/pictures/counting.png" alt="counting" style="width: 100%;">
+</div>
+<div style="float: left; width: 48%; margin-top: 10px;">
+  <img src="./readme/pictures/data_processing.png" alt="data_processing" style="width: 100%;">
+</div>
+
+<div style="clear: both;"></div>
+
+## Highlights
+
+- **High Degree of Project Engineering**
+
+  The code structure is clear and strictly follows the programming practices of high cohesion and low coupling.
+
+- **Stable and Efficient Software**
+
+  With the support of native Qt, Qthread multi-threading, etc., the software has excellent support for data processing and real-time analysis.
+
+- **Innovation Based on Basic Principles**
+
+  This project is based on basic libraries such as OpenCV. I have made innovations and improvements to the algorithms after a detailed understanding of OpenCV's algorithm encapsulation, which has taught me a lot!
 
 ## Features
 
@@ -14,7 +53,7 @@ Click [here](https://kama.2jone.top/) to get details about this softwear :)
 
 - **Real-time Image Acquisition**: Captures live images from the [IP camera](https://en.wikipedia.org/wiki/IP_camera) for real-time observation.
 
-- **Brightness Analysis**: This is my own optimized counting algorithm with a high accuracy.
+- **Brightness Analysis for Counting**: The counting method based on brightness analysis provides stable and highly accurate results.
 
 - **Data Visualization**: Counting results displayed based on [pyqtgraph](https://www.pyqtgraph.org/).
 
@@ -27,3 +66,8 @@ Click [here](https://kama.2jone.top/) to get details about this softwear :)
 - **GUI Framework**: PyQt
 - **Algorithm Supporting**: Numpy Scipy
 
+## Others
+
+[Here](https://kama.2jone.top/) is the official website of Kama, where you can get detailed information about this software, including the detailed technology stack and help documents. :)
+
+Click [here](https://github.com/lavanceeee/interference-ring-iden) to learn how I implemented the center-finding algorithm and to see the source code.
