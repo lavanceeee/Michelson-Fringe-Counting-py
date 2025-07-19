@@ -1,4 +1,3 @@
-import sys
 import cv2
 import numpy as np
 from PyQt6.QtWidgets import QMessageBox
@@ -12,40 +11,31 @@ from core.camera_controller import CameraController
 from gui.components.function_view import FunctionView
 from gui.components.console_view import ConsoleView
 from core.log_manager import log_manager, log_info, log_warning, log_error, log_debug
-from algorithm.circle_detector import CircleDetector
-from algorithm.cnn_circle_detector import load_inference_model
+# from algorithm.circle_detector import CircleDetector
+# from algorithm.cnn_circle_detector import load_inference_model
 from core.counts_detector import CountsDetector
-"""
-创建一个主窗口类
-主窗口类，继承自QMainWindow
-负责创建和管理应用程序的主界面
-"""
+
 class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # 初始化界面
         self.setup_ui()
 
-        # 初始化摄像头
         self.setup_camera()
 
         self.current_position = [0, 0]
 
-
-
-        # 自动检测定时器
         self.detection_timer = QTimer(self)
-        self.detection_timer.timeout.connect(self.detect_circles) # 定时器触发时调用检测方法
+        self.detection_timer.timeout.connect(self.detect_circles)
 
         self.detection_start_time = None
         self.current_processed_frame = None
         self.last_original_cv_frame = None
-        # 添加一个变量来存储最后显示的未标记图像
+
         self.last_unmarked_pixmap = None
         self.is_displaying_marked_image = False
         self.orignal_qimage = None
-        self.should_show_mark = False  # 是否需要显示十字标记
+        self.should_show_mark = False 
 
     def setup_ui(self):
         self.setWindowTitle("Kama")
@@ -57,15 +47,13 @@ class MyWindow(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        # 主布局垂直
         self.main_layout = QVBoxLayout(self.central_widget)
         self.main_layout.setContentsMargins(20, 20, 20, 20)
         self.main_layout.setSpacing(20)
-        self.main_layout.setAlignment(Qt.AlignmentFlag.AlignTop) # 整体内容顶部对齐
+        self.main_layout.setAlignment(Qt.AlignmentFlag.AlignTop) 
 
-        #1. 创建一个容器来包装顶部布局
         top_container = QFrame()
-        top_container.setObjectName("topContainer")  # 设置对象名
+        top_container.setObjectName("topContainer")  
         top_container.setFrameShape(QFrame.Shape.StyledPanel)
         top_container.setStyleSheet("""
             #topContainer {  
@@ -74,22 +62,18 @@ class MyWindow(QMainWindow):
             }
         """)
 
-        # 1. ---创建顶部水平布局---
-        self.top_layout = QHBoxLayout(top_container)  # 将布局直接设置给容器
-        self.top_layout.setContentsMargins(10, 10, 10, 10)  # 设置内边距
+        self.top_layout = QHBoxLayout(top_container)  
+        self.top_layout.setContentsMargins(10, 10, 10, 10) 
 
-        # 添加组件到顶部布局
         self.camera_display = CameraDisplay()
         self.figure_view = FigureView()
         self.top_layout.addWidget(self.camera_display)
         self.top_layout.addWidget(self.figure_view)
 
-        # 将包含边框的容器添加到主布局
         self.main_layout.addWidget(top_container)
 
-        # 2. 创建一个容器来包装底部布局，与顶部容器相同
         bottom_container = QFrame()
-        bottom_container.setObjectName("bottomContainer")  # 设置对象名
+        bottom_container.setObjectName("bottomContainer")  
         bottom_container.setFrameShape(QFrame.Shape.StyledPanel)
         bottom_container.setStyleSheet("""
             #bottomContainer {  
@@ -98,22 +82,18 @@ class MyWindow(QMainWindow):
             }
         """)
 
-        # 创建底部水平布局并设置给容器
-        self.bottom_layout = QHBoxLayout(bottom_container)  # 将布局直接设置给容器
-        self.bottom_layout.setContentsMargins(10, 10, 10, 10)  # 设置内边距
+        self.bottom_layout = QHBoxLayout(bottom_container)  
+        self.bottom_layout.setContentsMargins(10, 10, 10, 10)  
 
-        # 添加组件到底部布局
         self.function_view = FunctionView(self)
         self.console_view = ConsoleView()
         self.bottom_layout.addWidget(self.function_view)
         self.bottom_layout.addWidget(self.console_view)
 
-        # 添加日志管理器
         log_manager.set_console_view(self.console_view)
         log_info("调试窗口初始化完成")
         log_warning("请先连接摄像头设备")
 
-        # 将包含边框的底部容器添加到主布局
         self.main_layout.addWidget(bottom_container)
 
         # 当点击自动检测按钮时，调用toggle_detection
@@ -296,7 +276,7 @@ class MyWindow(QMainWindow):
 
             #初始化CNN连接
             # 绝对路径
-            model_path = r"D:\SoftwareEngining\workAndHue\compatation\physics\write\pythonFileNewVer\models\model_weights\best_model.pth"
+            model_path = r"D:\Software_engining\workAndHue\compatation\physics\write\pythonFileNewVer\models\model_weights\best_model.pth"
 
             log_info("正在加载CNN模型...")
 

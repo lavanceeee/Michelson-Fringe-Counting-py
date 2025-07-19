@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QDialog, QMessageBox
 from PyQt6.QtCore import Qt, pyqtSignal
-from torchgen.executorch.api.et_cpp import return_names
+# from torchgen.executorch.api.et_cpp import return_names
 
 from core.alert_manager import alert_error, alert_warning
 from core.log_manager import log_warning, log_info, log_error, log_debug
