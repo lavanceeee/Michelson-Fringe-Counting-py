@@ -96,34 +96,26 @@ class MyWindow(QMainWindow):
 
         self.main_layout.addWidget(bottom_container)
 
-        # 当点击自动检测按钮时，调用toggle_detection
         self.function_view.detect_circles_signal.connect(self.toggle_detection)
 
-        #点击确定，标记圆心坐标
         self.function_view.clicked_and_can_mark_signal.connect(self.mark_center)
 
-        #连接开始数条纹的信号
         self.function_view.start_count_signal.connect(self.toggle_light_count)
 
-        # 创建CountsDetector实例
         self.counts_detector = CountsDetector()
         
         self.counts_detector.center_brightness_signal.connect(self.figure_view.update_point_data)
 
-        #清理数据
         self.function_view.data_clear_signal.connect(self.clear_history_data)
 
     def setup_camera(self):
         self.camera_controller = CameraController()
 
-        # 将图像object连接到update_frame
         self.camera_controller.frame_ready.connect(self.update_frame)
         
-        # 添加对摄像头连接状态的处理
         self.camera_controller.connection_lost.connect(self.handle_camera_disconnected)
 
     def update_frame(self, image):
-        # 1. 首先处理 None 的情况
         if image is None:
             self.camera_display.clear()
             self.camera_display.setText("等待摄像头...")
@@ -134,15 +126,12 @@ class MyWindow(QMainWindow):
 
         if isinstance(image, QImage):
             try:
-                # A. 直接使用接收到的 QImage 创建用于显示的 Pixmap
                 pixmap = QPixmap.fromImage(image) 
 
                 self.last_unmarked_pixmap = pixmap
                 self.function_view.current_frame(pixmap)
                 
-                # B. 将 QImage 转换为 OpenCV 格式 (NumPy 数组) 以便后续处理
-                #    需要处理不同的 QImage 格式
-                image_copy = image.copy() # 操作副本以防修改原始 QImage
+                image_copy = image.copy() 
                 qimage_format = image_copy.format()
                 self.orignal_qimage = image
 
@@ -157,7 +146,7 @@ class MyWindow(QMainWindow):
                    qimage_format == QImage.Format.Format_ARGB32_Premultiplied:
                     # 4通道 (RGBA 或 ARGB)
                     ptr = image_copy.constBits()
-                    # ptr.setsize(image_copy.sizeInBytes()) # sizeInBytes 可能不准确，用 h*w*4
+
                     h, w = image_copy.height(), image_copy.width()
                     if h * w * 4 == 0:
                          log_error("QImage 尺寸为0")
@@ -190,8 +179,7 @@ class MyWindow(QMainWindow):
                     arr = np.frombuffer(ptr, dtype=np.uint8).reshape((h, w))
                     # 如果后续处理需要3通道 BGR 图像
                     cv_frame_for_processing = cv2.cvtColor(arr, cv2.COLOR_GRAY2BGR)
-                    # 如果后续处理可以接受单通道灰度图，则用:
-                    # cv_frame_for_processing = arr
+
                 else:
                     log_error(f"不支持的 QImage 格式用于转换: {qimage_format}")
                     self.last_original_cv_frame = None
@@ -200,7 +188,7 @@ class MyWindow(QMainWindow):
                     self.function_view.set_camera_connected(False)
                     return
 
-                # 存储转换后的 OpenCV 帧 (NumPy 数组)
+
                 self.last_original_cv_frame = cv_frame_for_processing.copy() # 存储 NumPy 数组
 
                 #计数信号
