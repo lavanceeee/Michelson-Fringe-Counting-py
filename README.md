@@ -6,6 +6,8 @@ Kama is an cross-platform desktop fostwear designed for <u>Michelson fringe coun
 
 It enables **real-time capture**, **processing** and **data analyse**.
 
+Click [here](https://kama.2jone.top/) to get details about this softwear :)
+
 ## Features
 
 - **Ring Center Detection**: Detects interference ring centers using traditional algorithms based on <u>OpenCV</u>
