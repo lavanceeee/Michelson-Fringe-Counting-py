@@ -140,54 +140,32 @@ class MyWindow(QMainWindow):
                     self.last_original_cv_frame = None
                     return
 
-                # 尝试更健壮的转换方式
-                if qimage_format == QImage.Format.Format_RGB32 or \
-                   qimage_format == QImage.Format.Format_ARGB32 or \
-                   qimage_format == QImage.Format.Format_ARGB32_Premultiplied:
-                    # 4通道 (RGBA 或 ARGB)
-                    ptr = image_copy.constBits()
-
+                try:
+                    # QImage->RGB888
+                    if image_copy.format() != QImage.Format.Format_RGB888:
+                        image_copy = image_copy.convertToFormat(QImage.Format.Format_RGB888)
+                    
+                    # RGB888->BGR
                     h, w = image_copy.height(), image_copy.width()
-                    if h * w * 4 == 0:
-                         log_error("QImage 尺寸为0")
-                         self.last_original_cv_frame = None
-                         return
-                    ptr.setsize(h * w * 4)
-                    arr = np.frombuffer(ptr, dtype=np.uint8).reshape((h, w, 4))
-                    # OpenCV 需要 BGR，所以从 RGBA 转 BGR
-                    cv_frame_for_processing = cv2.cvtColor(arr[:, :, :3], cv2.COLOR_RGB2BGR) # 取前3通道转 BGR
-                elif qimage_format == QImage.Format.Format_RGB888:
-                     # 3通道 RGB
+                    if h <= 0 or w <= 0:
+                        log_error("QImage 尺寸无效")
+                        self.last_original_cv_frame = None
+                        return
+                        
                     ptr = image_copy.constBits()
-                    h, w = image_copy.height(), image_copy.width()
-                    if h * w * 3 == 0:
-                         log_error("QImage 尺寸为0")
-                         self.last_original_cv_frame = None
-                         return
-                    ptr.setsize(h * w * 3)
+                    ptr.setsize(h * w * 3)  # RGB888格式是3通道
                     arr = np.frombuffer(ptr, dtype=np.uint8).reshape((h, w, 3))
+                    
+                    # RGB->BGR
                     cv_frame_for_processing = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
-                elif qimage_format == QImage.Format.Format_Grayscale8:
-                    # 1通道灰度
-                    ptr = image_copy.constBits()
-                    h, w = image_copy.height(), image_copy.width()
-                    if h * w * 1 == 0:
-                         log_error("QImage 尺寸为0")
-                         self.last_original_cv_frame = None
-                         return
-                    ptr.setsize(h * w * 1)
-                    arr = np.frombuffer(ptr, dtype=np.uint8).reshape((h, w))
-                    # 如果后续处理需要3通道 BGR 图像
-                    cv_frame_for_processing = cv2.cvtColor(arr, cv2.COLOR_GRAY2BGR)
-
-                else:
-                    log_error(f"不支持的 QImage 格式用于转换: {qimage_format}")
+                    
+                except Exception as e:
+                    log_error(f"图像转换失败: {str(e)}")
                     self.last_original_cv_frame = None
                     self.camera_display.clear()
-                    self.camera_display.setText("格式不支持")
+                    self.camera_display.setText("图像转换失败")
                     self.function_view.set_camera_connected(False)
                     return
-
 
                 self.last_original_cv_frame = cv_frame_for_processing.copy() # 存储 NumPy 数组
 
