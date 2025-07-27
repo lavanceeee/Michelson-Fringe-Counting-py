@@ -69,6 +69,6 @@ It enables **real-time capture**, **processing** and **data analyse**.
 
 ## Others
 
-[Here](https://kama.2jone.top/) is the official website of Kama, where you can get detailed information about this software, including the detailed technology stack and help documents. :)
+[Official website](https://kama.2jone.top) of Kama, where you can get detailed information about this software, including the detailed technology stack and help documents. :)
 
-Click [here](https://github.com/lavanceeee/interference-ring-iden) to learn how I implemented the center-finding algorithm and to see the source code.
+[Center Finder algorithm](https://github.com/lavanceeee/interference-ring-iden) of Kama, to learn how I implemented the center-finding algorithm and to see the source code.
